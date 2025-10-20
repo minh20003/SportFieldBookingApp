@@ -3,13 +3,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
     tools:context=".activities.HomeActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Chào mừng đến Màn hình chính!"
-        android:textSize="24sp" />
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewFields"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:listitem="@layout/item_sport_field" />
 
 </RelativeLayout>

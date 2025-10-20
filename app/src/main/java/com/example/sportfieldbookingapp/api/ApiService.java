@@ -2,6 +2,7 @@ package com.example.sportfieldbookingapp.api;
 
 import com.example.sportfieldbookingapp.models.LoginResponse;
 import com.example.sportfieldbookingapp.models.SportField;
+import com.example.sportfieldbookingapp.models.SportFieldResponse;
 import com.example.sportfieldbookingapp.models.User;
 
 
@@ -28,7 +29,7 @@ public interface ApiService {
     // API để lấy danh sách tất cả sân
     // Gửi yêu cầu GET đến "fields/read.php"
     @GET("fields/read.php")
-    Call<List<SportField>> getAllFields();
+    Call<SportFieldResponse> getAllFields();
 
     // API để lấy chi tiết một sân
     // Gửi yêu cầu GET đến "fields/read_single.php" với một tham số "id"

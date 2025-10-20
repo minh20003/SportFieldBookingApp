@@ -7,15 +7,23 @@
     android:orientation="vertical"
     android:gravity="center"
     android:padding="24dp"
-    tools:context=".activities.MainActivity">
+    tools:context=".activities.RegisterActivity">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Đăng Nhập"
+        android:text="Đăng Ký"
         android:textSize="32sp"
         android:textStyle="bold"
         android:layout_marginBottom="32dp"/>
+
+    <EditText
+        android:id="@+id/etFullName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Họ và Tên"
+        android:inputType="textPersonName"
+        android:layout_marginBottom="16dp"/>
 
     <EditText
         android:id="@+id/etEmail"
@@ -34,15 +42,9 @@
         android:layout_marginBottom="24dp"/>
 
     <Button
-        android:id="@+id/btnLogin"
+        android:id="@+id/btnRegister"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Đăng Nhập"/>
-    <TextView
-        android:id="@+id/tvGoToRegister"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Chưa có tài khoản? Đăng ký ngay"
-        android:layout_marginTop="16dp"
-        android:textColor="@color/black"/>
+        android:text="Đăng Ký"/>
+
 </LinearLayout>

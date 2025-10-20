@@ -11,11 +11,13 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.sportfieldbookingapp.R;
 import com.example.sportfieldbookingapp.activities.HomeActivity;
+import com.example.sportfieldbookingapp.activities.RegisterActivity;
 import com.example.sportfieldbookingapp.api.ApiClient;
 import com.example.sportfieldbookingapp.api.ApiService;
 import com.example.sportfieldbookingapp.models.LoginResponse;
@@ -29,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
 
     private EditText etEmail, etPassword;
     private Button btnLogin;
+    private TextView tvGoToRegister;
     private ApiService apiService;
 
     @Override
@@ -40,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
         btnLogin = findViewById(R.id.btnLogin);
+        tvGoToRegister = findViewById(R.id.tvGoToRegister); // Ánh xạ TextView mới
 
         // 2. Khởi tạo ApiService
         apiService = ApiClient.getClient().create(ApiService.class);
@@ -49,6 +53,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 loginUser();
+            }
+        });
+
+        // 4. Set sự kiện click cho TextView để chuyển sang màn hình Đăng ký
+        tvGoToRegister.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, RegisterActivity.class);
+                startActivity(intent);
             }
         });
     }
