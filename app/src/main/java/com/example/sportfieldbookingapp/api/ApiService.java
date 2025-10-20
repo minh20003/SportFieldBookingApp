@@ -12,7 +12,9 @@ import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
-
+import com.example.sportfieldbookingapp.models.Booking; // Thêm model cho Booking
+import retrofit2.http.Header; // Thêm import cho Header
+import com.example.sportfieldbookingapp.models.BookingResponse;
 public interface ApiService {
 
     // API để đăng nhập
@@ -36,5 +38,11 @@ public interface ApiService {
     @GET("fields/read_single.php")
     Call<SportField> getFieldById(@Query("id") int fieldId);
 
-    // ... chúng ta sẽ thêm các API khác (đặt sân,...) vào đây sau
+    @POST("bookings/create.php")
+    Call<Booking> createBooking(
+            @Header("Authorization") String authToken,
+            @Body Booking bookingRequest
+    );
+    @GET("bookings/read_my.php")
+    Call<BookingResponse> getMyBookings(@Header("Authorization") String authToken);
 }

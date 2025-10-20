@@ -5,10 +5,30 @@
     android:layout_height="match_parent"
     tools:context=".activities.HomeActivity">
 
+    <Button
+        android:id="@+id/btnLogout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_margin="16dp"
+        android:text="Đăng xuất"/>
+
+    <Button
+        android:id="@+id/btnMyBookings"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="16dp"
+        android:text="Đơn của tôi"/>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewFields"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@id/btnMyBookings"
+        android:paddingTop="8dp"
         tools:listitem="@layout/item_sport_field" />
 
 </RelativeLayout>

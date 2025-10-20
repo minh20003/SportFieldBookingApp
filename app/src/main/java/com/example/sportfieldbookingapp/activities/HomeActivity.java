@@ -1,11 +1,15 @@
 package com.example.sportfieldbookingapp.activities;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Button;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.sportfieldbookingapp.MainActivity;
 import com.example.sportfieldbookingapp.R;
 import com.example.sportfieldbookingapp.adapters.SportFieldAdapter;
 import com.example.sportfieldbookingapp.api.ApiClient;
@@ -25,7 +29,7 @@ public class HomeActivity extends AppCompatActivity {
     private SportFieldAdapter sportFieldAdapter;
     private List<SportField> fieldList = new ArrayList<>();
     private ApiService apiService;
-
+    private Button btnLogout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,6 +64,29 @@ public class HomeActivity extends AppCompatActivity {
 
         // 5. Gọi API để lấy dữ liệu sân
         fetchSportFields();
+        Button btnMyBookings = findViewById(R.id.btnMyBookings);
+        btnMyBookings.setOnClickListener(v -> {
+            Intent intent = new Intent(HomeActivity.this, MyBookingsActivity.class);
+            startActivity(intent);
+        });
+
+
+        // <<-- THÊM CODE XỬ LÝ NÚT ĐĂNG XUẤT -->>
+        btnLogout = findViewById(R.id.btnLogout);
+        btnLogout.setOnClickListener(v -> {
+            // 1. Xóa SharedPreferences
+            SharedPreferences sharedPreferences = getSharedPreferences("AppPrefs", MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.clear(); // Xóa tất cả dữ liệu đã lưu (token, tên người dùng,...)
+            editor.apply();
+
+            // 2. Chuyển về màn hình đăng nhập
+            Intent intent = new Intent(HomeActivity.this, MainActivity.class);
+            // Cờ này sẽ xóa hết các Activity cũ và tạo một task mới
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish(); // Đóng HomeActivity lại
+        });
     }
 
     /**
