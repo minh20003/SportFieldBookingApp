@@ -14,6 +14,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SportFieldBookingApp">
         <activity
+            android:name=".activities.BookingActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.FieldDetailActivity"
+            android:exported="false" />
+        <activity
             android:name=".activities.RegisterActivity"
             android:exported="false" />
         <activity

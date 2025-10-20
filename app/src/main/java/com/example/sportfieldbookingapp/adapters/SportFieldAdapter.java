@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -17,9 +18,28 @@ import java.util.List;
 
 public class SportFieldAdapter extends RecyclerView.Adapter<SportFieldAdapter.SportFieldViewHolder> {
 
-    private Context context;
-    private List<SportField> fieldList;
+    private final Context context;
+    private final List<SportField> fieldList;
+    private OnItemClickListener listener;
 
+    /**
+     * Interface để xử lý sự kiện click trên một item
+     */
+    public interface OnItemClickListener {
+        void onItemClick(int position);
+    }
+
+    /**
+     * Hàm để Activity có thể set listener cho adapter
+     * @param listener The listener that will be triggered on item clicks
+     */
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
+    }
+
+    /**
+     * Constructor của Adapter
+     */
     public SportFieldAdapter(Context context, List<SportField> fieldList) {
         this.context = context;
         this.fieldList = fieldList;
@@ -40,10 +60,9 @@ public class SportFieldAdapter extends RecyclerView.Adapter<SportFieldAdapter.Sp
 
         // Dùng Glide để load ảnh đầu tiên từ danh sách ảnh (nếu có)
         if (field.getImages() != null && !field.getImages().isEmpty()) {
-            // Lưu ý: URL ảnh thực tế sẽ cần được xử lý sau này
-            // Tạm thời chúng ta sẽ hiển thị ảnh mặc định
+            // Lưu ý: URL ảnh này là giả định, bạn cần thay thế bằng URL thật từ server
             Glide.with(context)
-                    .load(field.getImages().get(0)) // Lấy ảnh đầu tiên
+                    .load(field.getImages().get(0))
                     .placeholder(R.mipmap.ic_launcher) // Ảnh hiển thị trong khi chờ tải
                     .error(R.mipmap.ic_launcher_round) // Ảnh hiển thị nếu tải lỗi
                     .into(holder.ivFieldImage);
@@ -52,11 +71,13 @@ public class SportFieldAdapter extends RecyclerView.Adapter<SportFieldAdapter.Sp
 
     @Override
     public int getItemCount() {
-        return fieldList.size();
+        return fieldList != null ? fieldList.size() : 0;
     }
 
-    // Lớp ViewHolder để chứa các view của một item
-    public static class SportFieldViewHolder extends RecyclerView.ViewHolder {
+    /**
+     * Lớp ViewHolder để chứa và quản lý các View của một item
+     */
+    public class SportFieldViewHolder extends RecyclerView.ViewHolder {
         ImageView ivFieldImage;
         TextView tvFieldName, tvFieldAddress;
 
@@ -65,6 +86,16 @@ public class SportFieldAdapter extends RecyclerView.Adapter<SportFieldAdapter.Sp
             ivFieldImage = itemView.findViewById(R.id.ivFieldImage);
             tvFieldName = itemView.findViewById(R.id.tvFieldName);
             tvFieldAddress = itemView.findViewById(R.id.tvFieldAddress);
+
+            // Xử lý sự kiện click cho toàn bộ item
+            itemView.setOnClickListener(v -> {
+                if (listener != null) {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION) {
+                        listener.onItemClick(position);
+                    }
+                }
+            });
         }
     }
 }

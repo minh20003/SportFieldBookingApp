@@ -12,7 +12,7 @@ import com.example.sportfieldbookingapp.api.ApiClient;
 import com.example.sportfieldbookingapp.api.ApiService;
 import com.example.sportfieldbookingapp.models.SportField;
 import com.example.sportfieldbookingapp.models.SportFieldResponse; // Chúng ta sẽ cần tạo model này
-
+import android.content.Intent;
 import java.util.ArrayList;
 import java.util.List;
 import retrofit2.Call;
@@ -31,31 +31,52 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        // Khởi tạo RecyclerView
+        // 1. Ánh xạ và cài đặt RecyclerView
         recyclerViewFields = findViewById(R.id.recyclerViewFields);
         recyclerViewFields.setLayoutManager(new LinearLayoutManager(this));
 
-        // Khởi tạo Adapter
+        // 2. Khởi tạo Adapter và gán cho RecyclerView
         sportFieldAdapter = new SportFieldAdapter(this, fieldList);
         recyclerViewFields.setAdapter(sportFieldAdapter);
 
-        // Khởi tạo ApiService
+        // 3. Khởi tạo ApiService
         apiService = ApiClient.getClient().create(ApiService.class);
 
-        // Gọi hàm để lấy dữ liệu
+        // 4. Set sự kiện click cho Adapter
+        sportFieldAdapter.setOnItemClickListener(new SportFieldAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                // Lấy sân được click
+                SportField clickedField = fieldList.get(position);
+
+                // Tạo Intent để chuyển sang màn hình chi tiết
+                Intent intent = new Intent(HomeActivity.this, FieldDetailActivity.class);
+
+                // Gửi ID của sân được chọn sang màn hình chi tiết
+                intent.putExtra("FIELD_ID", clickedField.getId());
+                startActivity(intent);
+            }
+        });
+
+        // 5. Gọi API để lấy dữ liệu sân
         fetchSportFields();
     }
 
+    /**
+     * Hàm này thực hiện việc gọi API để lấy danh sách các sân thể thao.
+     */
     private void fetchSportFields() {
         Call<SportFieldResponse> call = apiService.getAllFields();
         call.enqueue(new Callback<SportFieldResponse>() {
             @Override
             public void onResponse(Call<SportFieldResponse> call, Response<SportFieldResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    // Xóa dữ liệu cũ và thêm dữ liệu mới từ API
+                    // Xóa dữ liệu cũ trong danh sách
                     fieldList.clear();
+                    // Thêm toàn bộ dữ liệu mới từ API vào danh sách
                     fieldList.addAll(response.body().getRecords());
-                    sportFieldAdapter.notifyDataSetChanged(); // Báo cho adapter biết dữ liệu đã thay đổi
+                    // Báo cho Adapter biết rằng dữ liệu đã thay đổi để nó cập nhật lại giao diện
+                    sportFieldAdapter.notifyDataSetChanged();
                 } else {
                     Toast.makeText(HomeActivity.this, "Không thể tải dữ liệu sân.", Toast.LENGTH_SHORT).show();
                 }
