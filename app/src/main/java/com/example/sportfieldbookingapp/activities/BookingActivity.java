@@ -25,7 +25,8 @@ import java.util.Locale;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-
+import com.example.sportfieldbookingapp.models.PaymentResponse;
+import android.content.Intent;
 public class BookingActivity extends AppCompatActivity {
 
     private int fieldId;
@@ -93,30 +94,59 @@ public class BookingActivity extends AppCompatActivity {
             return;
         }
 
-        // 2. Lấy token từ SharedPreferences
+        // 2. Lấy token
         SharedPreferences sharedPreferences = getSharedPreferences("AppPrefs", MODE_PRIVATE);
         String token = sharedPreferences.getString("USER_TOKEN", null);
-
         if (token == null) {
             Toast.makeText(this, "Lỗi xác thực. Vui lòng đăng nhập lại.", Toast.LENGTH_SHORT).show();
             return;
         }
-
-        // 3. Tạo đối tượng request
-        Booking bookingRequest = new Booking(fieldId, selectedDate, selectedTimeSlot, 200000); // Tạm thời để giá 200000
-
-        // 4. Gọi API
         String authToken = "Bearer " + token;
-        Call<Booking> call = apiService.createBooking(authToken, bookingRequest); // Sửa từ ApiService -> apiService
 
-        call.enqueue(new Callback<Booking>() {
+        // 3. TẠO ĐƠN ĐẶT SÂN TRƯỚC
+        long amount = 200000; // Tạm thời để giá 200000
+        Booking bookingRequest = new Booking(fieldId, selectedDate, selectedTimeSlot, amount);
+
+        Call<Booking> createBookingCall = apiService.createBooking(authToken, bookingRequest);
+        createBookingCall.enqueue(new Callback<Booking>() {
             @Override
             public void onResponse(Call<Booking> call, Response<Booking> response) {
-                if (response.isSuccessful()) {
-                    Toast.makeText(BookingActivity.this, "Đặt sân thành công!", Toast.LENGTH_LONG).show();
-                    finish(); // Đặt sân thành công thì đóng màn hình này lại
+                if (response.isSuccessful() && response.body() != null) {
+                    // 4. LẤY URL THANH TOÁN SAU KHI TẠO ĐƠN THÀNH CÔNG
+                    int bookingId = response.body().getId(); // Cần đảm bảo API createBooking trả về ID
+
+                    Call<PaymentResponse> paymentCall = apiService.createVnPayPayment(
+                            String.valueOf(bookingId),
+                            amount,
+                            "Thanh toan don hang #" + bookingId,
+                            "billpayment",
+                            "vn",
+                            "" // Để trống bankCode để người dùng tự chọn
+                    );
+
+                    paymentCall.enqueue(new Callback<PaymentResponse>() {
+                        @Override
+                        public void onResponse(Call<PaymentResponse> call, Response<PaymentResponse> response) {
+                            if (response.isSuccessful() && response.body() != null) {
+                                // 5. MỞ WEBVIEW VỚI URL VỪA NHẬN
+                                String paymentUrl = response.body().getPaymentUrl();
+                                Intent intent = new Intent(BookingActivity.this, PaymentWebViewActivity.class);
+                                intent.putExtra("PAYMENT_URL", paymentUrl);
+                                startActivity(intent);
+                                finish(); // Đóng màn hình đặt sân
+                            } else {
+                                Toast.makeText(BookingActivity.this, "Không thể tạo yêu cầu thanh toán.", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<PaymentResponse> call, Throwable t) {
+                            Toast.makeText(BookingActivity.this, "Lỗi khi tạo yêu cầu thanh toán: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
                 } else {
-                    Toast.makeText(BookingActivity.this, "Đặt sân thất bại. Vui lòng thử lại.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(BookingActivity.this, "Không thể tạo đơn đặt sân. Vui lòng thử lại.", Toast.LENGTH_SHORT).show();
                 }
             }
 

@@ -3,6 +3,7 @@ package com.example.sportfieldbookingapp.api;
 import com.example.sportfieldbookingapp.models.LoginResponse;
 import com.example.sportfieldbookingapp.models.SportField;
 import com.example.sportfieldbookingapp.models.SportFieldResponse;
+import com.example.sportfieldbookingapp.models.TeammatePost;
 import com.example.sportfieldbookingapp.models.User;
 
 
@@ -15,6 +16,11 @@ import retrofit2.http.Query;
 import com.example.sportfieldbookingapp.models.Booking; // Thêm model cho Booking
 import retrofit2.http.Header; // Thêm import cho Header
 import com.example.sportfieldbookingapp.models.BookingResponse;
+import com.example.sportfieldbookingapp.models.PaymentResponse;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
+import com.example.sportfieldbookingapp.models.TeammatePostResponse;
+import com.example.sportfieldbookingapp.models.GenericResponse;
 public interface ApiService {
 
     // API để đăng nhập
@@ -45,4 +51,21 @@ public interface ApiService {
     );
     @GET("bookings/read_my.php")
     Call<BookingResponse> getMyBookings(@Header("Authorization") String authToken);
+    @FormUrlEncoded
+    @POST("payment/vnpay_create_payment.php")
+    Call<PaymentResponse> createVnPayPayment(
+            @Field("order_id") String orderId,
+            @Field("amount") long amount,
+            @Field("order_desc") String orderDesc,
+            @Field("order_type") String orderType,
+            @Field("language") String language,
+            @Field("bank_code") String bankCode
+    );
+    @GET("teammates/read.php")
+    Call<TeammatePostResponse> getTeammatePosts();
+    @POST("teammates/create.php")
+    Call<GenericResponse> createTeammatePost(
+            @Header("Authorization") String authToken,
+            @Body TeammatePost post
+    );
 }
