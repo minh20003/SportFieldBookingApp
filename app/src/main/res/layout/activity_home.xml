@@ -15,6 +15,15 @@
         android:text="Đăng xuất"/>
 
     <Button
+        android:id="@+id/btnFindTeammate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="16dp"
+        android:text="Tìm người chơi"/>
+
+    <Button
         android:id="@+id/btnMyBookings"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

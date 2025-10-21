@@ -1,8 +1,8 @@
 package com.example.sportfieldbookingapp.models;
 
 import com.google.gson.annotations.SerializedName;
-
-public class TeammatePost {
+import java.io.Serializable;
+public class TeammatePost implements Serializable{
     @SerializedName("id")
     private int id;
     @SerializedName("sport_type")
@@ -17,6 +17,9 @@ public class TeammatePost {
     private String description;
     @SerializedName("poster_name")
     private String posterName;
+    @SerializedName("user_id")
+    private int userId;
+
     public TeammatePost(String sportType, String playDate, String timeSlot, int playersNeeded, String description) {
         this.sportType = sportType;
         this.playDate = playDate;
@@ -32,4 +35,13 @@ public class TeammatePost {
     public int getPlayersNeeded() { return playersNeeded; }
     public String getDescription() { return description; }
     public String getPosterName() { return posterName; }
+    public int getUserId() { return userId; }
+    public void setId(int id) {
+        this.id = id;
+    }
+    public void setSportType(String sportType) { this.sportType = sportType; }
+    public void setPlayDate(String playDate) { this.playDate = playDate; }
+    public void setTimeSlot(String timeSlot) { this.timeSlot = timeSlot; }
+    public void setPlayersNeeded(int playersNeeded) { this.playersNeeded = playersNeeded; }
+    public void setDescription(String description) { this.description = description; }
 }

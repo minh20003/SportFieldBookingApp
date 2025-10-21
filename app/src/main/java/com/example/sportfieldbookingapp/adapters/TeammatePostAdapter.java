@@ -4,6 +4,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -13,10 +14,25 @@ import java.util.List;
 
 public class TeammatePostAdapter extends RecyclerView.Adapter<TeammatePostAdapter.PostViewHolder> {
 
-    private List<TeammatePost> postList;
+    private final List<TeammatePost> postList;
+    private final int currentUserId;
+    private OnJoinButtonClickListener joinListener;
+    private OnDeleteButtonClickListener deleteListener;
+    private OnEditButtonClickListener editListener; // Listener cho nút Sửa
 
-    public TeammatePostAdapter(List<TeammatePost> postList) {
+    // Định nghĩa các interface cho các sự kiện click
+    public interface OnJoinButtonClickListener { void onJoinClick(TeammatePost post); }
+    public interface OnDeleteButtonClickListener { void onDeleteClick(TeammatePost post, int position); }
+    public interface OnEditButtonClickListener { void onEditClick(TeammatePost post); }
+
+    // Các hàm để Activity set listener
+    public void setOnJoinButtonClickListener(OnJoinButtonClickListener listener) { this.joinListener = listener; }
+    public void setOnDeleteButtonClickListener(OnDeleteButtonClickListener listener) { this.deleteListener = listener; }
+    public void setOnEditButtonClickListener(OnEditButtonClickListener listener) { this.editListener = listener; }
+
+    public TeammatePostAdapter(List<TeammatePost> postList, int currentUserId) {
         this.postList = postList;
+        this.currentUserId = currentUserId;
     }
 
     @NonNull
@@ -29,11 +45,21 @@ public class TeammatePostAdapter extends RecyclerView.Adapter<TeammatePostAdapte
     @Override
     public void onBindViewHolder(@NonNull PostViewHolder holder, int position) {
         TeammatePost post = postList.get(position);
+
         holder.tvSportType.setText("Môn: " + post.getSportType());
         holder.tvPosterName.setText("Người đăng: " + post.getPosterName());
         holder.tvPlayDateTime.setText("Thời gian: " + post.getTimeSlot() + " - " + post.getPlayDate());
         holder.tvPlayersNeeded.setText("Cần tìm: " + post.getPlayersNeeded() + " người");
         holder.tvDescription.setText("Mô tả: " + post.getDescription());
+
+        // Kiểm tra quyền sở hữu để hiển thị/ẩn nút
+        if (post.getUserId() == currentUserId) {
+            holder.ownerActionsLayout.setVisibility(View.VISIBLE);
+            holder.btnJoin.setVisibility(View.GONE);
+        } else {
+            holder.ownerActionsLayout.setVisibility(View.GONE);
+            holder.btnJoin.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -41,9 +67,10 @@ public class TeammatePostAdapter extends RecyclerView.Adapter<TeammatePostAdapte
         return postList.size();
     }
 
-    static class PostViewHolder extends RecyclerView.ViewHolder {
+    class PostViewHolder extends RecyclerView.ViewHolder {
         TextView tvSportType, tvPosterName, tvPlayDateTime, tvPlayersNeeded, tvDescription;
-        Button btnJoin;
+        Button btnJoin, btnEdit, btnDelete;
+        LinearLayout ownerActionsLayout;
 
         public PostViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -52,7 +79,33 @@ public class TeammatePostAdapter extends RecyclerView.Adapter<TeammatePostAdapte
             tvPlayDateTime = itemView.findViewById(R.id.tvPlayDateTime);
             tvPlayersNeeded = itemView.findViewById(R.id.tvPlayersNeeded);
             tvDescription = itemView.findViewById(R.id.tvDescription);
+
             btnJoin = itemView.findViewById(R.id.btnJoin);
+            btnEdit = itemView.findViewById(R.id.btnEdit);
+            btnDelete = itemView.findViewById(R.id.btnDelete);
+            ownerActionsLayout = itemView.findViewById(R.id.ownerActionsLayout);
+
+            btnJoin.setOnClickListener(v -> {
+                int position = getAdapterPosition();
+                if (joinListener != null && position != RecyclerView.NO_POSITION) {
+                    joinListener.onJoinClick(postList.get(position));
+                }
+            });
+
+            btnDelete.setOnClickListener(v -> {
+                int position = getAdapterPosition();
+                if (deleteListener != null && position != RecyclerView.NO_POSITION) {
+                    deleteListener.onDeleteClick(postList.get(position), position);
+                }
+            });
+
+            // Set listener cho nút Edit
+            btnEdit.setOnClickListener(v -> {
+                int position = getAdapterPosition();
+                if (editListener != null && position != RecyclerView.NO_POSITION) {
+                    editListener.onEditClick(postList.get(position));
+                }
+            });
         }
     }
 }

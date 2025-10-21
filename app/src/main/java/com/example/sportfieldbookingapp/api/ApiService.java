@@ -1,6 +1,9 @@
 package com.example.sportfieldbookingapp.api;
 
+import com.example.sportfieldbookingapp.models.DeletePostRequest;
+import com.example.sportfieldbookingapp.models.JoinPostRequest;
 import com.example.sportfieldbookingapp.models.LoginResponse;
+import com.example.sportfieldbookingapp.models.ReviewResponse;
 import com.example.sportfieldbookingapp.models.SportField;
 import com.example.sportfieldbookingapp.models.SportFieldResponse;
 import com.example.sportfieldbookingapp.models.TeammatePost;
@@ -21,6 +24,7 @@ import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import com.example.sportfieldbookingapp.models.TeammatePostResponse;
 import com.example.sportfieldbookingapp.models.GenericResponse;
+import com.example.sportfieldbookingapp.models.Review;
 public interface ApiService {
 
     // API để đăng nhập
@@ -65,6 +69,28 @@ public interface ApiService {
     Call<TeammatePostResponse> getTeammatePosts();
     @POST("teammates/create.php")
     Call<GenericResponse> createTeammatePost(
+            @Header("Authorization") String authToken,
+            @Body TeammatePost post
+    );
+    @POST("reviews/create.php")
+    Call<GenericResponse> postReview(
+            @Header("Authorization") String authToken,
+            @Body Review review
+    );
+    @GET("reviews/read.php")
+    Call<ReviewResponse> getReviewsForField(@Query("field_id") int fieldId);
+    @POST("teammates/join.php")
+    Call<GenericResponse> joinTeammatePost(
+            @Header("Authorization") String authToken,
+            @Body JoinPostRequest request
+    );
+    @POST("teammates/delete.php")
+    Call<GenericResponse> deleteTeammatePost(
+            @Header("Authorization") String authToken,
+            @Body DeletePostRequest request
+    );
+    @POST("teammates/update.php")
+    Call<GenericResponse> updateTeammatePost(
             @Header("Authorization") String authToken,
             @Body TeammatePost post
     );

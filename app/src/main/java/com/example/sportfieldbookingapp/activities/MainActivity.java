@@ -1,6 +1,6 @@
 
 
-package com.example.sportfieldbookingapp;
+package com.example.sportfieldbookingapp.activities;
 
 // Thay "yourname" bằng package name của bạn
 
@@ -16,8 +16,6 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.sportfieldbookingapp.R;
-import com.example.sportfieldbookingapp.activities.HomeActivity;
-import com.example.sportfieldbookingapp.activities.RegisterActivity;
 import com.example.sportfieldbookingapp.api.ApiClient;
 import com.example.sportfieldbookingapp.api.ApiService;
 import com.example.sportfieldbookingapp.models.LoginResponse;
@@ -101,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
                     // Lưu token và tên người dùng
                     editor.putString("USER_TOKEN", loginResponse.getToken());
                     editor.putString("USER_NAME", loginResponse.getUser().getFullName());
-
+                    editor.putInt("USER_ID", loginResponse.getUser().getId());
                     // Áp dụng các thay đổi
                     editor.apply();
 

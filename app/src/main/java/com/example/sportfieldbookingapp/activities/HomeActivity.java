@@ -9,7 +9,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.sportfieldbookingapp.MainActivity;
 import com.example.sportfieldbookingapp.R;
 import com.example.sportfieldbookingapp.adapters.SportFieldAdapter;
 import com.example.sportfieldbookingapp.api.ApiClient;
@@ -29,7 +28,8 @@ public class HomeActivity extends AppCompatActivity {
     private SportFieldAdapter sportFieldAdapter;
     private List<SportField> fieldList = new ArrayList<>();
     private ApiService apiService;
-    private Button btnLogout;
+    private Button btnLogout,
+     btnFindTeammate;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,6 +86,11 @@ public class HomeActivity extends AppCompatActivity {
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
             finish(); // Đóng HomeActivity lại
+        });
+        btnFindTeammate = findViewById(R.id.btnFindTeammate);
+        btnFindTeammate.setOnClickListener(v -> {
+            Intent intent = new Intent(HomeActivity.this, FindTeammateActivity.class);
+            startActivity(intent);
         });
     }
 

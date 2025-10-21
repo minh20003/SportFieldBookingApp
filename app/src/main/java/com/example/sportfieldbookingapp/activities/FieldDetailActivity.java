@@ -15,7 +15,13 @@ import com.example.sportfieldbookingapp.models.SportField;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import com.example.sportfieldbookingapp.adapters.ReviewAdapter;
+import com.example.sportfieldbookingapp.models.Review;
+import com.example.sportfieldbookingapp.models.ReviewResponse;
+import java.util.ArrayList;
+import java.util.List;
 public class FieldDetailActivity extends AppCompatActivity {
 
     private ImageView ivDetailImage;
@@ -23,7 +29,9 @@ public class FieldDetailActivity extends AppCompatActivity {
     private Button btnGoToBooking;
     private ApiService apiService;
     private int fieldId;
-
+    private RecyclerView recyclerViewReviews;
+    private ReviewAdapter reviewAdapter;
+    private List<Review> reviewList = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,12 +56,24 @@ public class FieldDetailActivity extends AppCompatActivity {
             Toast.makeText(this, "Không tìm thấy thông tin sân", Toast.LENGTH_SHORT).show();
             finish();
         }
+
         btnGoToBooking.setOnClickListener(v -> {
             Intent intent = new Intent(FieldDetailActivity.this, BookingActivity.class);
             // Gửi ID của sân này sang màn hình đặt sân
             intent.putExtra("FIELD_ID", fieldId);
             startActivity(intent);
         });
+        recyclerViewReviews = findViewById(R.id.recyclerViewReviews);
+        recyclerViewReviews.setLayoutManager(new LinearLayoutManager(this));
+        reviewAdapter = new ReviewAdapter(reviewList);
+        recyclerViewReviews.setAdapter(reviewAdapter);
+
+        if (fieldId != -1) {
+            fetchFieldDetails(fieldId);
+            fetchReviews(fieldId); // <<-- Gọi hàm lấy reviews
+        } else {
+            // ...
+        }
     }
 
     private void fetchFieldDetails(int id) {
@@ -86,5 +106,24 @@ public class FieldDetailActivity extends AppCompatActivity {
                     .load(field.getImages().get(0))
                     .into(ivDetailImage);
         }
+    }
+    private void fetchReviews(int fieldId) {
+        Call<ReviewResponse> call = apiService.getReviewsForField(fieldId);
+        call.enqueue(new Callback<ReviewResponse>() {
+            @Override
+            public void onResponse(Call<ReviewResponse> call, Response<ReviewResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    reviewList.clear();
+                    reviewList.addAll(response.body().getRecords());
+                    reviewAdapter.notifyDataSetChanged();
+                } else {
+                    // Không có review nào, không cần làm gì cả
+                }
+            }
+            @Override
+            public void onFailure(Call<ReviewResponse> call, Throwable t) {
+                Toast.makeText(FieldDetailActivity.this, "Lỗi tải đánh giá", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }
