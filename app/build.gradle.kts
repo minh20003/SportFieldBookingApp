@@ -47,8 +47,10 @@ dependencies {
 
     // Glide (Image loading)
     implementation("com.github.bumptech.glide:glide:4.16.0")
-    // Dòng annotationProcessor này có thể không cần thiết với các phiên bản mới,
-    // nhưng cứ thêm vào theo tài liệu để đảm bảo.
-    // ksp("com.github.bumptech.glide:compiler:4.16.0") // Nếu dùng KSP
-    // annotationProcessor("com.github.bumptech.glide:compiler:4.16.0") // Nếu dùng KAPT
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+// OkHttp Logging Interceptor - THÊM DÒNG NÀY
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+// Gson
+    implementation("com.google.code.gson:gson:2.10.1")
+    implementation("androidx.annotation:annotation:1.7.1")
 }

@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
 
     private EditText etEmail, etPassword;
     private Button btnLogin;
-    private TextView tvGoToRegister;
+    private TextView tvGoToRegister, tvForgotPassword;
     private ApiService apiService;
 
     @Override
@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         etPassword = findViewById(R.id.etPassword);
         btnLogin = findViewById(R.id.btnLogin);
         tvGoToRegister = findViewById(R.id.tvGoToRegister); // Ánh xạ TextView mới
-
+        tvForgotPassword = findViewById(R.id.tvForgotPassword);
         // 2. Khởi tạo ApiService
         apiService = ApiClient.getClient().create(ApiService.class);
 
@@ -61,6 +61,10 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(MainActivity.this, RegisterActivity.class);
                 startActivity(intent);
             }
+        });
+        tvForgotPassword.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, ForgotPasswordActivity.class);
+            startActivity(intent);
         });
     }
 

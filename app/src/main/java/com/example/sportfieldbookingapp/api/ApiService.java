@@ -10,7 +10,7 @@ import com.example.sportfieldbookingapp.models.TeammatePost;
 import com.example.sportfieldbookingapp.models.User;
 
 
-import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -25,6 +25,7 @@ import retrofit2.http.FormUrlEncoded;
 import com.example.sportfieldbookingapp.models.TeammatePostResponse;
 import com.example.sportfieldbookingapp.models.GenericResponse;
 import com.example.sportfieldbookingapp.models.Review;
+
 public interface ApiService {
 
     // API để đăng nhập
@@ -93,5 +94,31 @@ public interface ApiService {
     Call<GenericResponse> updateTeammatePost(
             @Header("Authorization") String authToken,
             @Body TeammatePost post
+    );
+    @GET("users/get_profile.php")
+    Call<User> getUserProfile(@Header("Authorization") String authToken);
+    @POST("users/update_profile.php")
+    Call<GenericResponse> updateUserProfile(
+            @Header("Authorization") String authToken,
+            @Body User user // Gửi đối tượng User chứa thông tin mới
+    );
+    // <<-- ADD FORGOT PASSWORD API -->>
+    @FormUrlEncoded // Send data as form fields, not JSON
+    @POST("auth/forgot_password.php")
+    Call<GenericResponse> requestPasswordReset(@Field("email") String email);
+
+    // <<-- ADD RESET PASSWORD API -->>
+    @FormUrlEncoded // Send data as form fields
+    @POST("auth/reset_password.php")
+    Call<GenericResponse> resetPassword(
+            @Field("email") String email,
+            @Field("otp") String otp,
+            @Field("new_password") String newPassword
+    );
+    @FormUrlEncoded
+    @POST("auth/verify_otp.php")
+    Call<GenericResponse> verifyOtp(
+            @Field("email") String email,
+            @Field("otp") String otp
     );
 }

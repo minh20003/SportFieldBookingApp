@@ -18,6 +18,8 @@ public class User {
     // Thêm thuộc tính password để gửi dữ liệu đi
     @SerializedName("password")
     private String password;
+    @SerializedName("phone")
+    private String phone;
 
     // --- Thêm các hàm khởi tạo (Constructors) ---
 
@@ -38,4 +40,11 @@ public class User {
     public int getId() { return id; }
     public String getFullName() { return fullName; }
     public String getEmail() { return email; }
+    public String getPhone() { return phone; }
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
 }

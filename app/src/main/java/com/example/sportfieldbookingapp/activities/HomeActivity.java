@@ -1,124 +1,58 @@
 package com.example.sportfieldbookingapp.activities;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
-import android.widget.Button;
-import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.example.sportfieldbookingapp.R;
-import com.example.sportfieldbookingapp.adapters.SportFieldAdapter;
-import com.example.sportfieldbookingapp.api.ApiClient;
-import com.example.sportfieldbookingapp.api.ApiService;
-import com.example.sportfieldbookingapp.models.SportField;
-import com.example.sportfieldbookingapp.models.SportFieldResponse; // Chúng ta sẽ cần tạo model này
-import android.content.Intent;
-import java.util.ArrayList;
-import java.util.List;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import com.example.sportfieldbookingapp.fragments.FindTeammateFragment;
+import com.example.sportfieldbookingapp.fragments.HomeFragment;
+import com.example.sportfieldbookingapp.fragments.MyBookingsFragment;
+import com.example.sportfieldbookingapp.fragments.ProfileFragment;
 
 public class HomeActivity extends AppCompatActivity {
 
-    private RecyclerView recyclerViewFields;
-    private SportFieldAdapter sportFieldAdapter;
-    private List<SportField> fieldList = new ArrayList<>();
-    private ApiService apiService;
-    private Button btnLogout,
-     btnFindTeammate;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        // 1. Ánh xạ và cài đặt RecyclerView
-        recyclerViewFields = findViewById(R.id.recyclerViewFields);
-        recyclerViewFields.setLayoutManager(new LinearLayoutManager(this));
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
 
-        // 2. Khởi tạo Adapter và gán cho RecyclerView
-        sportFieldAdapter = new SportFieldAdapter(this, fieldList);
-        recyclerViewFields.setAdapter(sportFieldAdapter);
+        // Load fragment mặc định
+        if (savedInstanceState == null) {
+            loadFragment(new HomeFragment());
+        }
 
-        // 3. Khởi tạo ApiService
-        apiService = ApiClient.getClient().create(ApiService.class);
+        // Xử lý sự kiện khi chọn một mục
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            Fragment selectedFragment = null;
+            int itemId = item.getItemId();
 
-        // 4. Set sự kiện click cho Adapter
-        sportFieldAdapter.setOnItemClickListener(new SportFieldAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(int position) {
-                // Lấy sân được click
-                SportField clickedField = fieldList.get(position);
-
-                // Tạo Intent để chuyển sang màn hình chi tiết
-                Intent intent = new Intent(HomeActivity.this, FieldDetailActivity.class);
-
-                // Gửi ID của sân được chọn sang màn hình chi tiết
-                intent.putExtra("FIELD_ID", clickedField.getId());
-                startActivity(intent);
+            if (itemId == R.id.nav_home) {
+                selectedFragment = new HomeFragment();
+            } else if (itemId == R.id.nav_my_bookings) {
+                selectedFragment = new MyBookingsFragment();
+            } else if (itemId == R.id.nav_find_teammate) {
+                selectedFragment = new FindTeammateFragment();
+            } else if (itemId == R.id.nav_profile) {
+                selectedFragment = new ProfileFragment();
             }
-        });
 
-        // 5. Gọi API để lấy dữ liệu sân
-        fetchSportFields();
-        Button btnMyBookings = findViewById(R.id.btnMyBookings);
-        btnMyBookings.setOnClickListener(v -> {
-            Intent intent = new Intent(HomeActivity.this, MyBookingsActivity.class);
-            startActivity(intent);
-        });
-
-
-        // <<-- THÊM CODE XỬ LÝ NÚT ĐĂNG XUẤT -->>
-        btnLogout = findViewById(R.id.btnLogout);
-        btnLogout.setOnClickListener(v -> {
-            // 1. Xóa SharedPreferences
-            SharedPreferences sharedPreferences = getSharedPreferences("AppPrefs", MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.clear(); // Xóa tất cả dữ liệu đã lưu (token, tên người dùng,...)
-            editor.apply();
-
-            // 2. Chuyển về màn hình đăng nhập
-            Intent intent = new Intent(HomeActivity.this, MainActivity.class);
-            // Cờ này sẽ xóa hết các Activity cũ và tạo một task mới
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            finish(); // Đóng HomeActivity lại
-        });
-        btnFindTeammate = findViewById(R.id.btnFindTeammate);
-        btnFindTeammate.setOnClickListener(v -> {
-            Intent intent = new Intent(HomeActivity.this, FindTeammateActivity.class);
-            startActivity(intent);
+            if (selectedFragment != null) {
+                loadFragment(selectedFragment);
+            }
+            return true;
         });
     }
 
-    /**
-     * Hàm này thực hiện việc gọi API để lấy danh sách các sân thể thao.
-     */
-    private void fetchSportFields() {
-        Call<SportFieldResponse> call = apiService.getAllFields();
-        call.enqueue(new Callback<SportFieldResponse>() {
-            @Override
-            public void onResponse(Call<SportFieldResponse> call, Response<SportFieldResponse> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    // Xóa dữ liệu cũ trong danh sách
-                    fieldList.clear();
-                    // Thêm toàn bộ dữ liệu mới từ API vào danh sách
-                    fieldList.addAll(response.body().getRecords());
-                    // Báo cho Adapter biết rằng dữ liệu đã thay đổi để nó cập nhật lại giao diện
-                    sportFieldAdapter.notifyDataSetChanged();
-                } else {
-                    Toast.makeText(HomeActivity.this, "Không thể tải dữ liệu sân.", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<SportFieldResponse> call, Throwable t) {
-                Toast.makeText(HomeActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-                Log.e("HOME_ACTIVITY_ERROR", "onFailure: " + t.getMessage());
-            }
-        });
+    private void loadFragment(Fragment fragment) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_container, fragment);
+        fragmentTransaction.commit();
     }
 }
