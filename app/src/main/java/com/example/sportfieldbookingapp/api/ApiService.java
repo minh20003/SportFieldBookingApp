@@ -121,4 +121,8 @@ public interface ApiService {
             @Field("email") String email,
             @Field("otp") String otp
     );
+    @FormUrlEncoded
+    @POST("users/update_fcm_token.php")
+    Call<GenericResponse> updateFcmToken(@Header("Authorization") String authToken, @Field("fcm_token") String fcmToken);
+
 }
