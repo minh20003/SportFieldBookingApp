@@ -3,6 +3,7 @@ package com.example.sportfieldbookingapp.adapters;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -11,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.sportfieldbookingapp.R;
 import com.example.sportfieldbookingapp.models.TeammatePost;
 import java.util.List;
-
+import android.view.View;
 public class TeammatePostAdapter extends RecyclerView.Adapter<TeammatePostAdapter.PostViewHolder> {
 
     private final List<TeammatePost> postList;
@@ -19,16 +20,17 @@ public class TeammatePostAdapter extends RecyclerView.Adapter<TeammatePostAdapte
     private OnJoinButtonClickListener joinListener;
     private OnDeleteButtonClickListener deleteListener;
     private OnEditButtonClickListener editListener; // Listener cho nút Sửa
-
+    private OnItemClickListener itemClickListener;
     // Định nghĩa các interface cho các sự kiện click
     public interface OnJoinButtonClickListener { void onJoinClick(TeammatePost post); }
     public interface OnDeleteButtonClickListener { void onDeleteClick(TeammatePost post, int position); }
     public interface OnEditButtonClickListener { void onEditClick(TeammatePost post); }
-
+    public interface OnItemClickListener { void onItemClick(TeammatePost post); }
     // Các hàm để Activity set listener
     public void setOnJoinButtonClickListener(OnJoinButtonClickListener listener) { this.joinListener = listener; }
     public void setOnDeleteButtonClickListener(OnDeleteButtonClickListener listener) { this.deleteListener = listener; }
     public void setOnEditButtonClickListener(OnEditButtonClickListener listener) { this.editListener = listener; }
+    public void setOnItemClickListener(OnItemClickListener listener) { this.itemClickListener = listener; }
 
     public TeammatePostAdapter(List<TeammatePost> postList, int currentUserId) {
         this.postList = postList;
@@ -40,6 +42,7 @@ public class TeammatePostAdapter extends RecyclerView.Adapter<TeammatePostAdapte
     public PostViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_teammate_post, parent, false);
         return new PostViewHolder(view);
+
     }
 
     @Override
@@ -104,6 +107,12 @@ public class TeammatePostAdapter extends RecyclerView.Adapter<TeammatePostAdapte
                 int position = getAdapterPosition();
                 if (editListener != null && position != RecyclerView.NO_POSITION) {
                     editListener.onEditClick(postList.get(position));
+                }
+            });
+            itemView.setOnClickListener(v -> {
+                int position = getAdapterPosition();
+                if (itemClickListener != null && position != RecyclerView.NO_POSITION) {
+                    itemClickListener.onItemClick(postList.get(position));
                 }
             });
         }

@@ -3,4 +3,7 @@
     <string name="default_notification_channel_id" translatable="false">sport_booking_channel</string>
     <string name="default_notification_channel_name">Thông báo Đặt sân</string>
     <string name="default_notification_channel_description">Thông báo về đơn đặt sân và tìm người chơi</string>
+        <string name="default_web_client_id" translatable="false">415762522921-7ramrtuthqbeel9ghef0nghm2u73l4r0.apps.googleusercontent.com</string>
+
+
 </resources>

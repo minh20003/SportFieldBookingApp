@@ -41,4 +41,7 @@ public class Booking {
     public String getFieldAddress() { return fieldAddress; }
     public String getBookingDate() { return bookingDate; }
     public String getTimeSlotStart() { return timeSlotStart; }
+    public void setStatus(String status) {
+        this.status = status;
+    }
 }

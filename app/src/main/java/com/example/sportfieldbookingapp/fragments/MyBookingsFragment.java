@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +24,9 @@ import com.example.sportfieldbookingapp.models.Booking;
 import com.example.sportfieldbookingapp.models.BookingResponse;
 import com.example.sportfieldbookingapp.models.GenericResponse;
 import com.example.sportfieldbookingapp.models.Review;
+import com.example.sportfieldbookingapp.models.CancelBookingRequest;
+import com.google.gson.Gson;
+
 import java.util.ArrayList;
 import java.util.List;
 import retrofit2.Call;
@@ -30,7 +34,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MyBookingsFragment extends Fragment {
-
+    private static final String TAG = "MyBookingsFragment";
     private RecyclerView recyclerViewMyBookings;
     private BookingAdapter bookingAdapter;
     private List<Booking> bookingList = new ArrayList<>();
@@ -53,9 +57,16 @@ public class MyBookingsFragment extends Fragment {
         recyclerViewMyBookings.setAdapter(bookingAdapter);
 
         bookingAdapter.setOnReviewButtonClickListener(booking -> showReviewDialog(booking));
-
+        bookingAdapter.setOnCancelButtonClickListener((booking, position) -> showCancelConfirmationDialog(booking, position));
         apiService = ApiClient.getClient().create(ApiService.class);
 
+        fetchMyBookings();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Tải lại danh sách khi quay lại Fragment này
         fetchMyBookings();
     }
 
@@ -120,7 +131,9 @@ public class MyBookingsFragment extends Fragment {
     private void postReview(int bookingId, int rating, String comment) {
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences("AppPrefs", Context.MODE_PRIVATE);
         String token = sharedPreferences.getString("USER_TOKEN", null);
-        if (token == null) { return; }
+        if (token == null) {
+            return;
+        }
 
         String authToken = "Bearer " + token;
         Review review = new Review(bookingId, rating, comment);
@@ -139,6 +152,72 @@ public class MyBookingsFragment extends Fragment {
             @Override
             public void onFailure(@NonNull Call<GenericResponse> call, @NonNull Throwable t) {
                 Toast.makeText(getContext(), "Lỗi: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void showCancelConfirmationDialog(Booking booking, int position) {
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Xác nhận hủy đơn")
+                .setMessage("Bạn có chắc chắn muốn hủy đơn đặt sân này không?")
+                .setPositiveButton("Hủy đơn", (dialog, which) -> cancelBooking(booking, position))
+                .setNegativeButton("Không", null)
+                .show();
+    }
+
+    // <<-- THÊM HÀM MỚI ĐỂ GỌI API HỦY -->>
+    private void cancelBooking(Booking booking, int position) {
+        Log.d(TAG, "Attempting to cancel booking ID: " + booking.getId());
+        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("AppPrefs", Context.MODE_PRIVATE);
+        String token = sharedPreferences.getString("USER_TOKEN", null);
+        if (token == null) {
+            Toast.makeText(getContext(), "Lỗi xác thực, vui lòng đăng nhập lại", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String authToken = "Bearer " + token;
+        CancelBookingRequest request = new CancelBookingRequest(booking.getId());
+
+        Call<GenericResponse> call = apiService.cancelBooking(authToken, request);
+        call.enqueue(new Callback<GenericResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<GenericResponse> call, @NonNull Response<GenericResponse> response) {
+                if (isAdded()) { // Kiểm tra Fragment còn tồn tại
+                    if (response.isSuccessful()) {
+                        Log.i(TAG, "Booking cancelled successfully, ID: " + booking.getId());
+                        Toast.makeText(getContext(), "Hủy đơn thành công", Toast.LENGTH_SHORT).show();
+
+                        // Cập nhật trạng thái đơn hàng trong danh sách ngay lập tức
+                        booking.setStatus("cancelled"); // <<< Cần thêm hàm setStatus vào Booking.java
+                        bookingAdapter.notifyItemChanged(position);
+
+                        // Hoặc tải lại toàn bộ danh sách
+                        // fetchMyBookings();
+                    } else {
+                        String errorMessage = "Hủy đơn thất bại. Có thể đơn đã qua trạng thái cho phép hủy.";
+                        try {
+                            if (response.errorBody() != null) {
+                                Gson gson = new Gson();
+                                GenericResponse errorResponse = gson.fromJson(response.errorBody().string(), GenericResponse.class);
+                                if (errorResponse != null && errorResponse.getMessage() != null) {
+                                    errorMessage = errorResponse.getMessage();
+                                }
+                            }
+                        } catch (Exception e) {
+                            Log.e(TAG, "Error parsing error body", e);
+                        }
+                        Log.e(TAG, "Failed to cancel booking ID: " + booking.getId() + ", Error: " + errorMessage);
+                        Toast.makeText(getContext(), errorMessage, Toast.LENGTH_LONG).show();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<GenericResponse> call, @NonNull Throwable t) {
+                if (isAdded()) {
+                    Log.e(TAG, "Error cancelling booking ID: " + booking.getId(), t);
+                    Toast.makeText(getContext(), "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }

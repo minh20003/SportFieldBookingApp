@@ -38,16 +38,32 @@
             android:layout_marginTop="8dp"
             android:text="Trạng thái: pending"
             android:textStyle="italic"/>
-
-        <Button
-            android:id="@+id/btnReview"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="end"
+            android:orientation="horizontal"
             android:layout_marginTop="8dp"
-            android:text="Đánh giá"
-            android:visibility="gone"
-            tools:visibility="visible"/>
+            android:gravity="end">
 
+            <Button
+                android:id="@+id/btnCancelBooking"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Hủy Đơn"
+                style="?android:attr/buttonBarButtonStyle"
+                android:textColor="#F44336"
+                android:visibility="gone"
+                tools:visibility="visible"
+                android:layout_marginEnd="8dp"/>
+
+            <Button
+                android:id="@+id/btnReview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Đánh giá"
+                style="?android:attr/buttonBarButtonStyle"
+                android:visibility="gone"
+                tools:visibility="visible"/>
+        </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>

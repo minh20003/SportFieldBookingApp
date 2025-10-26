@@ -1,5 +1,6 @@
 package com.example.sportfieldbookingapp.api;
 
+import com.example.sportfieldbookingapp.models.CancelBookingRequest;
 import com.example.sportfieldbookingapp.models.DeletePostRequest;
 import com.example.sportfieldbookingapp.models.JoinPostRequest;
 import com.example.sportfieldbookingapp.models.LoginResponse;
@@ -25,7 +26,7 @@ import retrofit2.http.FormUrlEncoded;
 import com.example.sportfieldbookingapp.models.TeammatePostResponse;
 import com.example.sportfieldbookingapp.models.GenericResponse;
 import com.example.sportfieldbookingapp.models.Review;
-
+import com.example.sportfieldbookingapp.models.GoogleSignInRequest;
 public interface ApiService {
 
     // API để đăng nhập
@@ -124,5 +125,11 @@ public interface ApiService {
     @FormUrlEncoded
     @POST("users/update_fcm_token.php")
     Call<GenericResponse> updateFcmToken(@Header("Authorization") String authToken, @Field("fcm_token") String fcmToken);
-
+    @POST("bookings/cancel_booking.php")
+    Call<GenericResponse> cancelBooking(
+            @Header("Authorization") String authToken,
+            @Body CancelBookingRequest request
+    );
+    @POST("auth/google_signin.php")
+    Call<LoginResponse> loginWithGoogle(@Body GoogleSignInRequest request);
 }

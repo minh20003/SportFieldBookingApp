@@ -1,5 +1,6 @@
 package com.example.sportfieldbookingapp.adapters;
 
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,22 +15,16 @@ import java.util.List;
 public class BookingAdapter extends RecyclerView.Adapter<BookingAdapter.BookingViewHolder> {
 
     private final List<Booking> bookingList;
-    private OnReviewButtonClickListener listener;
+    private OnReviewButtonClickListener reviewListener;
+    private OnCancelButtonClickListener cancelListener; // Listener mới cho nút Hủy
 
-    /**
-     * Interface (hợp đồng) để Activity có thể lắng nghe sự kiện
-     * khi người dùng nhấn nút "Đánh giá".
-     */
-    public interface OnReviewButtonClickListener {
-        void onReviewClick(Booking booking);
-    }
+    // Interfaces cho các sự kiện click
+    public interface OnReviewButtonClickListener { void onReviewClick(Booking booking); }
+    public interface OnCancelButtonClickListener { void onCancelClick(Booking booking, int position); } // Thêm position
 
-    /**
-     * Hàm để Activity có thể truyền listener vào cho adapter.
-     */
-    public void setOnReviewButtonClickListener(OnReviewButtonClickListener listener) {
-        this.listener = listener;
-    }
+    // Hàm set listener
+    public void setOnReviewButtonClickListener(OnReviewButtonClickListener listener) { this.reviewListener = listener; }
+    public void setOnCancelButtonClickListener(OnCancelButtonClickListener listener) { this.cancelListener = listener; } // Thêm hàm set
 
     public BookingAdapter(List<Booking> bookingList) {
         this.bookingList = bookingList;
@@ -45,19 +40,24 @@ public class BookingAdapter extends RecyclerView.Adapter<BookingAdapter.BookingV
     @Override
     public void onBindViewHolder(@NonNull BookingViewHolder holder, int position) {
         Booking booking = bookingList.get(position);
-
-        // Gán dữ liệu cho các TextView
         holder.tvFieldName.setText(booking.getFieldName());
         String dateTime = "Ngày: " + booking.getBookingDate() + " - Giờ: " + booking.getTimeSlotStart();
         holder.tvDateTime.setText(dateTime);
         String status = "Trạng thái: " + booking.getStatus();
         holder.tvStatus.setText(status);
 
-        // Kiểm tra trạng thái đơn hàng để hiển thị hoặc ẩn nút "Đánh giá"
+        // Hiển thị nút "Đánh giá" nếu đơn hàng đã "completed"
         if ("completed".equalsIgnoreCase(booking.getStatus())) {
             holder.btnReview.setVisibility(View.VISIBLE);
         } else {
             holder.btnReview.setVisibility(View.GONE);
+        }
+
+        // Hiển thị nút "Hủy Đơn" nếu trạng thái là 'pending' hoặc 'confirmed'
+        if ("pending".equalsIgnoreCase(booking.getStatus()) || "confirmed".equalsIgnoreCase(booking.getStatus())) {
+            holder.btnCancel.setVisibility(View.VISIBLE);
+        } else {
+            holder.btnCancel.setVisibility(View.GONE);
         }
     }
 
@@ -68,7 +68,7 @@ public class BookingAdapter extends RecyclerView.Adapter<BookingAdapter.BookingV
 
     class BookingViewHolder extends RecyclerView.ViewHolder {
         TextView tvFieldName, tvDateTime, tvStatus;
-        Button btnReview;
+        Button btnReview, btnCancel; // Thêm btnCancel
 
         public BookingViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -76,14 +76,21 @@ public class BookingAdapter extends RecyclerView.Adapter<BookingAdapter.BookingV
             tvDateTime = itemView.findViewById(R.id.tvBookingDateTime);
             tvStatus = itemView.findViewById(R.id.tvBookingStatus);
             btnReview = itemView.findViewById(R.id.btnReview);
+            btnCancel = itemView.findViewById(R.id.btnCancelBooking); // Ánh xạ nút Hủy
 
-            // Set sự kiện click cho nút "Đánh giá"
+            // Sự kiện click nút Đánh giá (giữ nguyên)
             btnReview.setOnClickListener(v -> {
                 int position = getAdapterPosition();
-                // Đảm bảo listener không null và vị trí hợp lệ
-                if (listener != null && position != RecyclerView.NO_POSITION) {
-                    // Gọi hàm trong interface, truyền vào đối tượng booking tương ứng
-                    listener.onReviewClick(bookingList.get(position));
+                if (reviewListener != null && position != RecyclerView.NO_POSITION) {
+                    reviewListener.onReviewClick(bookingList.get(position));
+                }
+            });
+
+            // Sự kiện click nút Hủy
+            btnCancel.setOnClickListener(v -> {
+                int position = getAdapterPosition();
+                if (cancelListener != null && position != RecyclerView.NO_POSITION) {
+                    cancelListener.onCancelClick(bookingList.get(position), position); // Gọi listener Hủy
                 }
             });
         }

@@ -1,11 +1,14 @@
 package com.example.sportfieldbookingapp.fragments;
 
 
+import static android.content.ContentValues.TAG;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +18,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.sportfieldbookingapp.activities.TeammatePostDetailActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.example.sportfieldbookingapp.R;
 import com.example.sportfieldbookingapp.activities.CreatePostActivity;
@@ -99,6 +104,13 @@ public class FindTeammateFragment extends Fragment {
         adapter.setOnEditButtonClickListener(post -> {
             Intent intent = new Intent(getActivity(), EditPostActivity.class);
             intent.putExtra("POST_TO_EDIT", post);
+            startActivity(intent);
+        });
+        adapter.setOnItemClickListener(post -> {
+            Log.d(TAG, "Item clicked: " + post.getId());
+            Intent intent = new Intent(getActivity(), TeammatePostDetailActivity.class);
+            // Gửi toàn bộ đối tượng Post sang màn hình chi tiết
+            intent.putExtra("POST_DETAIL", post);
             startActivity(intent);
         });
     }

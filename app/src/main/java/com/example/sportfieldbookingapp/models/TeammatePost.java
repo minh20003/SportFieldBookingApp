@@ -19,7 +19,8 @@ public class TeammatePost implements Serializable{
     private String posterName;
     @SerializedName("user_id")
     private int userId;
-
+    @SerializedName("poster_phone")
+    private String posterPhone;
     public TeammatePost(String sportType, String playDate, String timeSlot, int playersNeeded, String description) {
         this.sportType = sportType;
         this.playDate = playDate;
@@ -44,4 +45,7 @@ public class TeammatePost implements Serializable{
     public void setTimeSlot(String timeSlot) { this.timeSlot = timeSlot; }
     public void setPlayersNeeded(int playersNeeded) { this.playersNeeded = playersNeeded; }
     public void setDescription(String description) { this.description = description; }
+    public String getPosterPhone() {
+        return posterPhone;
+    }
 }
