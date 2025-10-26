@@ -137,8 +137,17 @@ public class MainActivity extends AppCompatActivity {
     // --- HÀM BẮT ĐẦU LUỒNG ĐĂNG NHẬP GOOGLE ---
     private void signInWithGoogle() {
         Log.d(TAG, "signInWithGoogle: Starting Google Sign In intent");
-        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-        googleSignInLauncher.launch(signInIntent); // Sử dụng launcher mới
+
+        // <<-- THÊM DÒNG NÀY ĐỂ BẮT BUỘC HIỂN THỊ CHỌN TÀI KHOẢN -->>
+        // Đăng xuất khỏi Google Sign-In client trước khi đăng nhập mới
+        // Việc này sẽ xóa bộ nhớ đệm (cache) về tài khoản đã chọn lần trước
+        mGoogleSignInClient.signOut().addOnCompleteListener(this, task -> {
+            // Sau khi đã đăng xuất (hoặc nếu có lỗi, cũng không sao),
+            // chúng ta tiếp tục mở màn hình đăng nhập
+            Log.d(TAG, "signInWithGoogle: signOut complete, launching sign-in intent.");
+            Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+            googleSignInLauncher.launch(signInIntent); // Sử dụng launcher mới
+        });
     }
 
     // --- HÀM XỬ LÝ KẾT QUẢ GOOGLE SIGN IN ---
