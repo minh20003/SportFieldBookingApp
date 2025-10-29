@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "415762522921",
+    "project_id": "sportfieldbookingapp",
+    "storage_bucket": "sportfieldbookingapp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:415762522921:android:7eeee2e057273ac2004d38",
+        "android_client_info": {
+          "package_name": "com.example.sportfieldbookingapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "415762522921-naaoqjki5b66grlt47peuojqe23p7ii7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.sportfieldbookingapp",
+            "certificate_hash": "deb3c04ca871c23bcd37d10ddfc8548f22ab9350"
+          }
+        },
+        {
+          "client_id": "415762522921-7ramrtuthqbeel9ghef0nghm2u73l4r0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC47WmXXiVerrsRQKbcn9KFOZzP7Qt-z6Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "415762522921-7ramrtuthqbeel9ghef0nghm2u73l4r0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
