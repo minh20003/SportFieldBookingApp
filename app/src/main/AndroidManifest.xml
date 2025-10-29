@@ -34,6 +34,9 @@
             android:name=".activities.FindTeammateActivity"
             android:exported="false" />
         <activity
+            android:name=".activities.PaymentSuccessActivity"
+            android:exported="false" />
+        <activity
             android:name=".activities.PaymentWebViewActivity"
             android:exported="false" />
         <activity

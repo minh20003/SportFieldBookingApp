@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.example.sportfieldbookingapp.R;
 import com.example.sportfieldbookingapp.api.ApiClient;
@@ -34,6 +35,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
     private Button btnSendOtp, btnVerifyOtp, btnResetPassword;
     private LinearLayout layoutEnterEmail, layoutEnterOtp, layoutResetPassword;
     private ApiService apiService;
+    private Toolbar toolbar;
 
     private String userEmail; // Store email from step 1
     private String enteredOtp; // Store OTP from step 2
@@ -44,12 +46,14 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         setContentView(R.layout.activity_forgot_password);
         Log.d(TAG, "onCreate: Activity created");
 
-        // Add Toolbar/ActionBar with Back Button
+        // Setup Toolbar with back button
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle("Quên mật khẩu");
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
         }
+        toolbar.setNavigationOnClickListener(v -> finish());
 
         // Map Views
         etForgotEmail = findViewById(R.id.etForgotEmail);

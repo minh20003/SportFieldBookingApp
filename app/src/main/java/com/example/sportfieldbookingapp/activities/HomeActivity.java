@@ -73,6 +73,15 @@ public class HomeActivity extends AppCompatActivity {
      * Kiểm tra Intent đến và điều hướng đến Fragment phù hợp.
      */
     private void handleIntent(Intent intent) {
+        // Check for NAVIGATE_TO_BOOKINGS flag from PaymentSuccessActivity
+        if (intent != null && intent.getBooleanExtra("NAVIGATE_TO_BOOKINGS", false)) {
+            Log.d(TAG, "handleIntent: NAVIGATE_TO_BOOKINGS flag found");
+            loadFragment(new MyBookingsFragment());
+            bottomNavigationView.setSelectedItemId(R.id.nav_my_bookings);
+            intent.removeExtra("NAVIGATE_TO_BOOKINGS");
+            return;
+        }
+        
         if (intent != null && intent.hasExtra("NAVIGATE_TO")) {
             String navigateTo = intent.getStringExtra("NAVIGATE_TO");
             Log.d(TAG, "handleIntent: NAVIGATE_TO extra found: " + navigateTo);
@@ -122,12 +131,21 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     /**
-     * Hàm để thay thế fragment hiện tại trong FrameLayout.
+     * Hàm để thay thế fragment hiện tại trong FrameLayout với animation mượt mà.
      */
     private void loadFragment(Fragment fragment) {
         Log.d(TAG, "loadFragment: Loading " + fragment.getClass().getSimpleName());
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        
+        // Thêm fade animation cho fragment transitions
+        fragmentTransaction.setCustomAnimations(
+            R.anim.fade_in,
+            R.anim.fade_out,
+            R.anim.fade_in,
+            R.anim.fade_out
+        );
+        
         fragmentTransaction.replace(R.id.fragment_container, fragment);
         // fragmentTransaction.addToBackStack(null); // Không nên thêm vào back stack cho các tab chính
         fragmentTransaction.commit();

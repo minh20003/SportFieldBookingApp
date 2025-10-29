@@ -10,6 +10,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import com.example.sportfieldbookingapp.R;
 import com.example.sportfieldbookingapp.api.ApiClient;
 import com.example.sportfieldbookingapp.api.ApiService;
@@ -27,6 +28,7 @@ public class CreatePostActivity extends AppCompatActivity {
     private Button btnSelectDate, btnSelectTime, btnSubmitPost;
     private TextView tvSelectedDateTime;
     private ApiService apiService;
+    private Toolbar toolbar;
 
     private String selectedDate = "";
     private String selectedTime = "";
@@ -35,6 +37,15 @@ public class CreatePostActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_post);
+
+        // Setup Toolbar with back button
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
+        toolbar.setNavigationOnClickListener(v -> finish());
 
         // Ánh xạ views
         etSportType = findViewById(R.id.etSportType);

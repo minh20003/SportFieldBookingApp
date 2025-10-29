@@ -67,6 +67,14 @@ public class FindTeammateFragment extends Fragment {
         recyclerViewPosts = view.findViewById(R.id.recyclerViewPosts);
         fabCreatePost = view.findViewById(R.id.fabCreatePost);
 
+        // Debug: Kiểm tra FAB có null không
+        if (fabCreatePost != null) {
+            Log.d("FindTeammateFragment", "FAB found and initialized");
+            fabCreatePost.show(); // Đảm bảo FAB được hiển thị
+        } else {
+            Log.e("FindTeammateFragment", "FAB is NULL!");
+        }
+
         // Cài đặt RecyclerView
         recyclerViewPosts.setLayoutManager(new LinearLayoutManager(getContext()));
         adapter = new TeammatePostAdapter(postList, currentUserId);

@@ -1,26 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
     tools:context=".activities.TeammatePostDetailActivity">
 
-    <LinearLayout
+    <!-- Toolbar with Back Button -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:elevation="4dp"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        app:navigationIcon="?attr/homeAsUpIndicator"
+        app:title="Chi tiết tin tìm người"
+        app:titleTextColor="@android:color/white" />
 
-        <TextView
-            android:id="@+id/tvDetailSportType"
-            android:layout_width="wrap_content"
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            tools:text="Môn: Bóng đá"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            android:textColor="?attr/colorPrimary"
-            android:layout_marginBottom="8dp"/>
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/tvDetailSportType"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="Môn: Bóng đá"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:textColor="?attr/colorPrimary"
+                android:layout_marginBottom="8dp"/>
 
         <TextView
             android:id="@+id/tvDetailPosterName"
@@ -88,11 +106,14 @@
             android:textColor="?attr/colorPrimary"
             android:textIsSelectable="true"/>
 
-        <Button
-            android:id="@+id/btnDetailAction"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            tools:text="Tham gia"/>
+            <Button
+                android:id="@+id/btnDetailAction"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:text="Tham gia"/>
 
-    </LinearLayout>
-</ScrollView>
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>

@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull; // <<< Import
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 // <<< THAY PACKAGE CỦA BẠN >>>
 import com.example.sportfieldbookingapp.R;
@@ -43,6 +44,7 @@ public class TeammatePostDetailActivity extends AppCompatActivity {
     private ApiService apiService;
     private TeammatePost currentPost;
     private int currentUserId = -1;
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,12 +52,14 @@ public class TeammatePostDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_teammate_post_detail);
         Log.d(TAG, "onCreate: Activity created");
 
-        // Bật nút Back trên Toolbar
+        // Setup Toolbar with back button
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle("Chi tiết Tin đăng");
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
         }
+        toolbar.setNavigationOnClickListener(v -> finish());
 
         // Ánh xạ Views (bao gồm cả nút)
         tvDetailSportType = findViewById(R.id.tvDetailSportType);

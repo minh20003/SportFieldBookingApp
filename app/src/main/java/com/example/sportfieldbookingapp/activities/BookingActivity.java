@@ -8,6 +8,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -36,6 +37,7 @@ public class BookingActivity extends AppCompatActivity {
     private TimeSlotAdapter timeSlotAdapter;
     private List<String> timeSlotList = new ArrayList<>();
     private ApiService apiService;
+    private Toolbar toolbar;
 
     private String selectedDate = "";
     private String selectedTimeSlot = "";
@@ -44,6 +46,15 @@ public class BookingActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_booking);
+
+        // Setup Toolbar with back button
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
+        toolbar.setNavigationOnClickListener(v -> finish());
 
         // 1. Ánh xạ tất cả các View
         btnSelectDate = findViewById(R.id.btnSelectDate);

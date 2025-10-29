@@ -88,11 +88,13 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "tvGoToRegister clicked");
             Intent intent = new Intent(MainActivity.this, RegisterActivity.class);
             startActivity(intent);
+            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
         });
         tvForgotPassword.setOnClickListener(v -> {
             Log.d(TAG, "tvForgotPassword clicked");
             Intent intent = new Intent(MainActivity.this, ForgotPasswordActivity.class);
             startActivity(intent);
+            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
         });
         btnGoogleSignIn.setOnClickListener(v -> {
             Log.d(TAG, "btnGoogleSignIn clicked");
@@ -302,10 +304,11 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "saveUserInfoAndNavigate: Pending FCM token found and send attempt initiated.");
         }
 
-        // Chuyển sang màn hình chính
+        // Chuyển sang màn hình chính với animation
         Intent intent = new Intent(MainActivity.this, HomeActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
+        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
         finish(); // Đóng màn hình đăng nhập
     }
 

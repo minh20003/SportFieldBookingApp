@@ -28,12 +28,17 @@ public class PaymentWebViewActivity extends AppCompatActivity {
                 if (url.contains("vnpay_return.php")) {
                     // Dựa vào các tham số trên URL để biết thành công hay thất bại
                     if (url.contains("vnp_ResponseCode=00")) {
-                        Toast.makeText(PaymentWebViewActivity.this, "Thanh toán thành công!", Toast.LENGTH_LONG).show();
+                        // Thanh toán thành công - chuyển đến màn hình thành công
+                        Intent intent = new Intent(PaymentWebViewActivity.this, PaymentSuccessActivity.class);
+                        intent.putExtra("RETURN_URL", url);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                        finish();
                     } else {
-                        Toast.makeText(PaymentWebViewActivity.this, "Thanh toán thất bại!", Toast.LENGTH_LONG).show();
+                        // Thanh toán thất bại
+                        Toast.makeText(PaymentWebViewActivity.this, "Thanh toán thất bại hoặc bị hủy!", Toast.LENGTH_LONG).show();
+                        finish();
                     }
-                    // Đóng màn hình thanh toán và quay về
-                    finish();
                 }
             }
         });
