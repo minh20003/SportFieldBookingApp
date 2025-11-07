@@ -3,10 +3,17 @@ package com.example.sportfieldbookingapp.api;
 import com.example.sportfieldbookingapp.models.AvailabilityResponse;
 import com.example.sportfieldbookingapp.models.BookingDetail;
 import com.example.sportfieldbookingapp.models.CancelBookingRequest;
+import com.example.sportfieldbookingapp.models.ChatMessageListResponse;
+import com.example.sportfieldbookingapp.models.ChatRoomListResponse;
+import com.example.sportfieldbookingapp.models.CreateChatRoomRequest;
+import com.example.sportfieldbookingapp.models.CreateChatRoomResponse;
 import com.example.sportfieldbookingapp.models.DeletePostRequest;
 import com.example.sportfieldbookingapp.models.JoinPostRequest;
 import com.example.sportfieldbookingapp.models.LoginResponse;
+import com.example.sportfieldbookingapp.models.MarkNotificationRequest;
+import com.example.sportfieldbookingapp.models.NotificationResponse;
 import com.example.sportfieldbookingapp.models.ReviewResponse;
+import com.example.sportfieldbookingapp.models.SendMessageRequest;
 import com.example.sportfieldbookingapp.models.SportField;
 import com.example.sportfieldbookingapp.models.SportFieldResponse;
 import com.example.sportfieldbookingapp.models.TeammatePost;
@@ -18,6 +25,7 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Query;
 import com.example.sportfieldbookingapp.models.Booking; // Thêm model cho Booking
 import retrofit2.http.Header; // Thêm import cho Header
@@ -141,6 +149,64 @@ public interface ApiService {
             @Query("field_id") int fieldId,
             @Query("date") String date
     );
+    @GET("notifications/get_list.php")
+    Call<NotificationResponse> getNotifications(
+            @Header("Authorization") String token,
+            @Query("page") int page,
+            @Query("limit") int limit
+    );
 
+    /**
+     * Đánh dấu thông báo đã đọc
+     * PUT /api/notifications/mark_read.php
+     */
+    @PUT("notifications/mark_read.php")
+    Call<GenericResponse> markNotificationRead(
+            @Header("Authorization") String token,
+            @Body MarkNotificationRequest request
+    );
+
+    // ==================== CHAT API ====================
+
+    /**
+     * Tạo hoặc lấy chat room giữa 2 users
+     * POST /api/chat/create_or_get_room.php
+     */
+    @POST("chat/create_or_get_room.php")
+    Call<CreateChatRoomResponse> createOrGetChatRoom(
+            @Header("Authorization") String token,
+            @Body CreateChatRoomRequest request
+    );
+
+    /**
+     * Lấy danh sách chat rooms
+     * GET /api/chat/get_rooms.php
+     */
+    @GET("chat/get_rooms.php")
+    Call<ChatRoomListResponse> getChatRooms(
+            @Header("Authorization") String token
+    );
+
+    /**
+     * Lấy tin nhắn trong chat room
+     * GET /api/chat/get_messages.php
+     */
+    @GET("chat/get_messages.php")
+    Call<ChatMessageListResponse> getChatMessages(
+            @Header("Authorization") String token,
+            @Query("room_id") int roomId,
+            @Query("page") int page,
+            @Query("limit") int limit
+    );
+
+    /**
+     * Gửi tin nhắn
+     * POST /api/chat/send_message.php
+     */
+    @POST("chat/send_message.php")
+    Call<GenericResponse> sendChatMessage(
+            @Header("Authorization") String token,
+            @Body SendMessageRequest request
+    );
 
 }

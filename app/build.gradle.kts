@@ -60,4 +60,5 @@ dependencies {
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("androidx.annotation:annotation:1.7.1")
     implementation("com.google.android.gms:play-services-auth:21.0.0")
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01")
 }

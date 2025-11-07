@@ -26,6 +26,7 @@ import com.example.sportfieldbookingapp.api.ApiClient;
 import com.example.sportfieldbookingapp.api.ApiService;
 import com.example.sportfieldbookingapp.models.SportField;
 import com.example.sportfieldbookingapp.models.SportFieldResponse;
+import com.example.sportfieldbookingapp.utils.SearchUtils;
 import java.util.ArrayList;
 import java.util.List;
 import retrofit2.Call;
@@ -111,10 +112,10 @@ public class HomeFragment extends Fragment {
         if (query.isEmpty()) {
             filteredList.addAll(fieldList);
         } else {
-            String lowerQuery = query.toLowerCase();
+            String lowerQuery = query; // use SearchUtils normalization instead
             for (SportField field : fieldList) {
-                if (field.getName().toLowerCase().contains(lowerQuery) ||
-                        field.getAddress().toLowerCase().contains(lowerQuery)) {
+                if (SearchUtils.containsNormalized(field.getName(), lowerQuery) ||
+                        SearchUtils.containsNormalized(field.getAddress(), lowerQuery)) {
                     filteredList.add(field);
                 }
             }

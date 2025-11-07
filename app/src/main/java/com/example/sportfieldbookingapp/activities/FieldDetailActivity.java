@@ -26,6 +26,7 @@ import com.example.sportfieldbookingapp.models.Review;
 import com.example.sportfieldbookingapp.models.ReviewResponse;
 import java.util.ArrayList;
 import java.util.List;
+import com.example.sportfieldbookingapp.utils.ImageUrlHelper;
 
 public class FieldDetailActivity extends AppCompatActivity {
 
@@ -136,14 +137,20 @@ public class FieldDetailActivity extends AppCompatActivity {
             collapsingToolbar.setTitle(field.getName());
         }
 
-        // Dùng Glide để load ảnh
+        // Dùng Glide để load ảnh an toàn
+        String imageUrl;
         if (field.getImages() != null && !field.getImages().isEmpty()) {
-            Glide.with(this)
-                    .load(field.getImages().get(0))
-                    .placeholder(R.mipmap.ic_launcher)
-                    .error(R.mipmap.ic_launcher)
-                    .into(ivDetailImage);
+            imageUrl = ImageUrlHelper.buildUrl(field.getImages().get(0));
+        } else {
+            // Nếu không có ảnh, sử dụng ảnh fallback từ Unsplash
+            imageUrl = ImageUrlHelper.getFallbackImageUrl(field.getId());
         }
+        
+        Glide.with(this)
+                .load(imageUrl)
+                .placeholder(R.drawable.placeholder_field)
+                .error(R.drawable.placeholder_field)
+                .into(ivDetailImage);
     }
 
     @Override

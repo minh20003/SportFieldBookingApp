@@ -20,6 +20,8 @@ import androidx.appcompat.widget.Toolbar;
 import com.example.sportfieldbookingapp.R;
 import com.example.sportfieldbookingapp.api.ApiClient;
 import com.example.sportfieldbookingapp.api.ApiService;
+import com.example.sportfieldbookingapp.models.CreateChatRoomRequest;
+import com.example.sportfieldbookingapp.models.CreateChatRoomResponse;
 import com.example.sportfieldbookingapp.models.GenericResponse;
 import com.example.sportfieldbookingapp.models.JoinPostRequest;
 import com.example.sportfieldbookingapp.models.TeammatePost;
@@ -40,10 +42,13 @@ public class TeammatePostDetailActivity extends AppCompatActivity {
     // Khai báo đầy đủ các View
     private TextView tvDetailSportType, tvDetailPosterName, tvDetailPlayDateTime,
             tvDetailPlayersNeeded, tvDetailDescription, tvDetailContactInfo;
-    private Button btnDetailAction; // <<< Khai báo nút
+    private Button btnDetailAction;
+    private Button btnChat;
     private ApiService apiService;
     private TeammatePost currentPost;
     private int currentUserId = -1;
+    private int postOwnerId = -1;
+    private String postOwnerName = "";
     private Toolbar toolbar;
 
     @Override
@@ -68,7 +73,8 @@ public class TeammatePostDetailActivity extends AppCompatActivity {
         tvDetailPlayersNeeded = findViewById(R.id.tvDetailPlayersNeeded);
         tvDetailDescription = findViewById(R.id.tvDetailDescription);
         tvDetailContactInfo = findViewById(R.id.tvDetailContactInfo);
-        btnDetailAction = findViewById(R.id.btnDetailAction); // <<< Ánh xạ nút
+        btnDetailAction = findViewById(R.id.btnDetailAction);
+        btnChat = findViewById(R.id.btnChat);
 
         apiService = ApiClient.getClient().create(ApiService.class);
 
@@ -88,6 +94,7 @@ public class TeammatePostDetailActivity extends AppCompatActivity {
             Log.d(TAG, "onCreate: Received Post ID: " + currentPost.getId());
             populateUI(currentPost);
             setupActionButton(currentPost);
+            setupChatButton(currentPost);
         } else {
             Log.e(TAG, "onCreate: No Post data received!");
             Toast.makeText(this, "Lỗi: Không thể tải chi tiết tin đăng.", Toast.LENGTH_SHORT).show();
@@ -112,6 +119,9 @@ public class TeammatePostDetailActivity extends AppCompatActivity {
         tvDetailPlayDateTime.setText("Thời gian: " + post.getTimeSlot() + " - " + post.getPlayDate());
         tvDetailPlayersNeeded.setText("Cần tìm: " + post.getPlayersNeeded() + " người");
         tvDetailDescription.setText(post.getDescription());
+
+        postOwnerId = post.getUserId();
+        postOwnerName = post.getPosterName();
 
         // Hiển thị SĐT và cho phép gọi
         String phone = post.getPosterPhone(); // <<< Đảm bảo hàm này tồn tại trong TeammatePost.java
@@ -151,6 +161,71 @@ public class TeammatePostDetailActivity extends AppCompatActivity {
                 joinPost(post);
             });
         }
+    }
+
+    private void setupChatButton(TeammatePost post) {
+        if (btnChat == null) {
+            return;
+        }
+
+        if (currentUserId == post.getUserId()) {
+            btnChat.setVisibility(View.GONE);
+            btnChat.setOnClickListener(null);
+        } else {
+            btnChat.setVisibility(View.VISIBLE);
+            btnChat.setOnClickListener(v -> {
+                if (postOwnerId > 0) {
+                    createOrOpenChatRoom(postOwnerId, postOwnerName != null ? postOwnerName : "Người đăng");
+                } else {
+                    Toast.makeText(this, "Không xác định được người đăng", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
+
+    /**
+     * Tạo hoặc mở phòng chat với người đăng bài
+     */
+    private void createOrOpenChatRoom(int otherUserId, String otherUserName) {
+        SharedPreferences sharedPreferences = getSharedPreferences("AppPrefs", Context.MODE_PRIVATE);
+        String authToken = sharedPreferences.getString("USER_TOKEN", null);
+
+        if (authToken == null) {
+            Toast.makeText(this, "Vui lòng đăng nhập", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String token = "Bearer " + authToken;
+        int currentPostId = currentPost != null ? currentPost.getId() : getIntent().getIntExtra("POST_ID", 0);
+
+        CreateChatRoomRequest request = new CreateChatRoomRequest(otherUserId, currentPostId > 0 ? currentPostId : null);
+
+        btnChat.setEnabled(false);
+
+        apiService.createOrGetChatRoom(token, request).enqueue(new Callback<CreateChatRoomResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<CreateChatRoomResponse> call, @NonNull Response<CreateChatRoomResponse> response) {
+                btnChat.setEnabled(true);
+
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    int roomId = response.body().getRoomId();
+                    Intent intent = new Intent(TeammatePostDetailActivity.this, ChatActivity.class);
+                    intent.putExtra("room_id", roomId);
+                    intent.putExtra("other_user_name", otherUserName);
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(TeammatePostDetailActivity.this, "Không thể mở phòng chat", Toast.LENGTH_SHORT).show();
+                    Log.w(TAG, "createOrGetChatRoom: Failed - " + (response.body() != null ? response.body().getMessage() : response.message()));
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<CreateChatRoomResponse> call, @NonNull Throwable t) {
+                btnChat.setEnabled(true);
+                Log.e(TAG, "createOrGetChatRoom error: " + t.getMessage());
+                Toast.makeText(TeammatePostDetailActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     // Hàm gọi API tham gia

@@ -12,6 +12,11 @@
         android:title="Đơn của tôi"/>
 
     <item
+        android:id="@+id/nav_messages"
+        android:icon="@drawable/ic_chat"
+        android:title="Tin nhắn"/>
+
+    <item
         android:id="@+id/nav_find_teammate"
         android:icon="@drawable/ic_groups"
         android:title="Tìm người"/>

@@ -106,11 +106,34 @@
             android:textColor="?attr/colorPrimary"
             android:textIsSelectable="true"/>
 
-            <Button
-                android:id="@+id/btnDetailAction"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                tools:text="Tham gia"/>
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginTop="8dp">
+
+                <Button
+                    android:id="@+id/btnDetailAction"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    android:textColor="@android:color/white"
+                    tools:text="Tham gia"
+                    android:backgroundTint="#4CAF50" />
+
+                <Button
+                    android:id="@+id/btnChat"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:text="\uD83D\uDCAC Nhắn tin"
+                    android:textColor="@android:color/white"
+                    android:backgroundTint="#2196F3" />
+
+            </LinearLayout>
 
         </LinearLayout>
 

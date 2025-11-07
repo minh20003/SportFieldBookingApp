@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.sportfieldbookingapp.R;
 import com.example.sportfieldbookingapp.models.SportField;
+import com.example.sportfieldbookingapp.utils.ImageUrlHelper;
 
 import java.util.List;
 
@@ -59,14 +60,19 @@ public class SportFieldAdapter extends RecyclerView.Adapter<SportFieldAdapter.Sp
         holder.tvFieldAddress.setText(field.getAddress());
 
         // Dùng Glide để load ảnh đầu tiên từ danh sách ảnh (nếu có)
+        String imageUrl;
         if (field.getImages() != null && !field.getImages().isEmpty()) {
-            // Lưu ý: URL ảnh này là giả định, bạn cần thay thế bằng URL thật từ server
-            Glide.with(context)
-                    .load(field.getImages().get(0))
-                    .placeholder(R.mipmap.ic_launcher) // Ảnh hiển thị trong khi chờ tải
-                    .error(R.mipmap.ic_launcher_round) // Ảnh hiển thị nếu tải lỗi
-                    .into(holder.ivFieldImage);
+            imageUrl = ImageUrlHelper.buildUrl(field.getImages().get(0));
+        } else {
+            // Nếu không có ảnh, sử dụng ảnh fallback từ Unsplash
+            imageUrl = ImageUrlHelper.getFallbackImageUrl(field.getId());
         }
+        
+        Glide.with(context)
+                .load(imageUrl)
+                .placeholder(R.drawable.placeholder_field) // Ảnh hiển thị trong khi chờ tải
+                .error(R.drawable.placeholder_field) // Ảnh hiển thị nếu tải lỗi
+                .into(holder.ivFieldImage);
     }
 
     @Override
