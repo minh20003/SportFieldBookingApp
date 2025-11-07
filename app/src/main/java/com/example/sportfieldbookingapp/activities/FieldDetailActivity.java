@@ -26,6 +26,7 @@ import com.example.sportfieldbookingapp.models.Review;
 import com.example.sportfieldbookingapp.models.ReviewResponse;
 import java.util.ArrayList;
 import java.util.List;
+
 public class FieldDetailActivity extends AppCompatActivity {
 
     private ImageView ivDetailImage;
@@ -36,9 +37,11 @@ public class FieldDetailActivity extends AppCompatActivity {
     private CollapsingToolbarLayout collapsingToolbar;
     private ApiService apiService;
     private int fieldId;
+    private String fieldName = ""; // ⭐ THÊM BIẾN LƯU TÊN SÂN
     private RecyclerView recyclerViewReviews;
     private ReviewAdapter reviewAdapter;
     private List<Review> reviewList = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,7 +60,7 @@ public class FieldDetailActivity extends AppCompatActivity {
         });
 
         collapsingToolbar = findViewById(R.id.collapsingToolbar);
-        
+
         // Ánh xạ views
         ivDetailImage = findViewById(R.id.ivDetailImage);
         tvDetailName = findViewById(R.id.tvDetailName);
@@ -79,25 +82,25 @@ public class FieldDetailActivity extends AppCompatActivity {
             finish();
         }
 
+        // ⭐ SỬA LISTENER - Truyền tên sân
         View.OnClickListener bookingClickListener = v -> {
             Intent intent = new Intent(FieldDetailActivity.this, BookingActivity.class);
             intent.putExtra("FIELD_ID", fieldId);
+            intent.putExtra("FIELD_NAME", fieldName); // ⭐ THÊM DÒNG NÀY
             startActivity(intent);
             overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
         };
-        
+
         btnGoToBooking.setOnClickListener(bookingClickListener);
         fabBooking.setOnClickListener(bookingClickListener);
+
         recyclerViewReviews = findViewById(R.id.recyclerViewReviews);
         recyclerViewReviews.setLayoutManager(new LinearLayoutManager(this));
         reviewAdapter = new ReviewAdapter(reviewList);
         recyclerViewReviews.setAdapter(reviewAdapter);
 
         if (fieldId != -1) {
-            fetchFieldDetails(fieldId);
-            fetchReviews(fieldId); // <<-- Gọi hàm lấy reviews
-        } else {
-            // ...
+            fetchReviews(fieldId);
         }
     }
 
@@ -121,10 +124,13 @@ public class FieldDetailActivity extends AppCompatActivity {
     }
 
     private void populateUI(SportField field) {
+        // ⭐ LƯU TÊN SÂN VÀO BIẾN
+        fieldName = field.getName();
+
         tvDetailName.setText(field.getName());
         tvDetailAddress.setText(field.getAddress());
         tvDetailDescription.setText(field.getDescription());
-        
+
         // Set collapsing toolbar title
         if (collapsingToolbar != null) {
             collapsingToolbar.setTitle(field.getName());
@@ -139,12 +145,13 @@ public class FieldDetailActivity extends AppCompatActivity {
                     .into(ivDetailImage);
         }
     }
-    
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();
         overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
     }
+
     private void fetchReviews(int fieldId) {
         Call<ReviewResponse> call = apiService.getReviewsForField(fieldId);
         call.enqueue(new Callback<ReviewResponse>() {

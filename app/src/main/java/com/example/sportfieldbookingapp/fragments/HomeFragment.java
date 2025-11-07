@@ -58,12 +58,12 @@ public class HomeFragment extends Fragment {
         recyclerViewFields = view.findViewById(R.id.recyclerViewFields);
         etSearch = view.findViewById(R.id.etSearch);
         progressBar = view.findViewById(R.id.progressBar);
-        
+
         recyclerViewFields.setLayoutManager(new LinearLayoutManager(getContext()));
-        
+
         // Thêm animation cho RecyclerView
         LayoutAnimationController animation = AnimationUtils.loadLayoutAnimation(
-            getContext(), R.anim.layout_animation_fall_down);
+                getContext(), R.anim.layout_animation_fall_down);
         recyclerViewFields.setLayoutAnimation(animation);
 
         // 2. Khởi tạo Adapter và gán cho RecyclerView
@@ -114,7 +114,7 @@ public class HomeFragment extends Fragment {
             String lowerQuery = query.toLowerCase();
             for (SportField field : fieldList) {
                 if (field.getName().toLowerCase().contains(lowerQuery) ||
-                    field.getAddress().toLowerCase().contains(lowerQuery)) {
+                        field.getAddress().toLowerCase().contains(lowerQuery)) {
                     filteredList.add(field);
                 }
             }
@@ -127,7 +127,7 @@ public class HomeFragment extends Fragment {
         if (progressBar != null) {
             progressBar.setVisibility(View.VISIBLE);
         }
-        
+
         Call<SportFieldResponse> call = apiService.getAllFields();
         call.enqueue(new Callback<SportFieldResponse>() {
             @Override
@@ -135,7 +135,7 @@ public class HomeFragment extends Fragment {
                 if (progressBar != null) {
                     progressBar.setVisibility(View.GONE);
                 }
-                
+
                 if (response.isSuccessful() && response.body() != null) {
                     fieldList.clear();
                     fieldList.addAll(response.body().getRecords());

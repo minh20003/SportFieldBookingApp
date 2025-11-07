@@ -1,5 +1,7 @@
 package com.example.sportfieldbookingapp.api;
 
+import com.example.sportfieldbookingapp.models.AvailabilityResponse;
+import com.example.sportfieldbookingapp.models.BookingDetail;
 import com.example.sportfieldbookingapp.models.CancelBookingRequest;
 import com.example.sportfieldbookingapp.models.DeletePostRequest;
 import com.example.sportfieldbookingapp.models.JoinPostRequest;
@@ -67,6 +69,8 @@ public interface ApiService {
             @Field("language") String language,
             @Field("bank_code") String bankCode
     );
+    @GET("bookings/read_single_booking.php")
+    Call<BookingDetail> getBookingDetail(@Query("id") int bookingId);
     @GET("teammates/read.php")
     Call<TeammatePostResponse> getTeammatePosts();
     @POST("teammates/create.php")
@@ -132,4 +136,11 @@ public interface ApiService {
     );
     @POST("auth/google_signin.php")
     Call<LoginResponse> loginWithGoogle(@Body GoogleSignInRequest request);
+    @GET("bookings/check_availability.php")
+    Call<AvailabilityResponse> checkAvailability(
+            @Query("field_id") int fieldId,
+            @Query("date") String date
+    );
+
+
 }

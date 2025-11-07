@@ -3,12 +3,20 @@ package com.example.sportfieldbookingapp.activities;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.sportfieldbookingapp.R;
+import com.example.sportfieldbookingapp.api.ApiClient;
+import com.example.sportfieldbookingapp.api.ApiService;
+import com.example.sportfieldbookingapp.models.BookingDetail;
 import java.text.NumberFormat;
 import java.util.Locale;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class PaymentSuccessActivity extends AppCompatActivity {
 
@@ -16,17 +24,22 @@ public class PaymentSuccessActivity extends AppCompatActivity {
     private TextView tvPaymentMethod, tvTransactionId, tvTotalAmount;
     private Button btnViewBookings, btnBackToHome;
 
+    private ApiService apiService;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_payment_success);
+
+        // Initialize API service
+        apiService = ApiClient.getClient().create(ApiService.class);
 
         // Initialize views
         initializeViews();
 
         // Get data from intent
         String returnUrl = getIntent().getStringExtra("RETURN_URL");
-        
+
         // Parse URL parameters
         if (returnUrl != null) {
             parseUrlParameters(returnUrl);
@@ -64,17 +77,17 @@ public class PaymentSuccessActivity extends AppCompatActivity {
     private void parseUrlParameters(String url) {
         try {
             Uri uri = Uri.parse(url);
-            
+
             // Get VNPay transaction parameters
             String vnpTxnRef = uri.getQueryParameter("vnp_TxnRef");  // This is booking_id
             String amountStr = uri.getQueryParameter("vnp_Amount");
             String transactionNo = uri.getQueryParameter("vnp_TransactionNo");
             String paymentMethod = uri.getQueryParameter("vnp_BankCode");
-            
+
             // Set booking ID from vnp_TxnRef
             if (vnpTxnRef != null && !vnpTxnRef.isEmpty()) {
                 tvBookingId.setText("#" + vnpTxnRef);
-                // Fetch booking details from API
+                // ⭐ Fetch booking details from API
                 fetchBookingDetails(vnpTxnRef);
             }
 
@@ -103,22 +116,78 @@ public class PaymentSuccessActivity extends AppCompatActivity {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e("PaymentSuccess", "Error parsing URL", e);
         }
     }
-    
-    private void fetchBookingDetails(String bookingId) {
-        // For now, use static data. You can implement API call later if needed
-        // The booking details are already updated in the database by vnpay_return.php
-        // You could make an API call here to get the full booking details
-        
-        // Placeholder - you can enhance this with actual API call
-        tvFieldName.setText("Đang tải...");
-        tvBookingDate.setText("--");
-        tvTimeSlot.setText("--");
-        
-        // TODO: Implement API call to fetch booking details
-        // For now, the user can view details in "My Bookings" section
+
+    // ⭐⭐⭐ IMPLEMENT API CALL ĐỂ LẤY THÔNG TIN ĐẦY ĐỦ
+    private void fetchBookingDetails(String bookingIdStr) {
+        try {
+            int bookingId = Integer.parseInt(bookingIdStr);
+
+            // Hiển thị loading
+            tvFieldName.setText("Đang tải...");
+            tvBookingDate.setText("--");
+            tvTimeSlot.setText("--");
+
+            Log.d("PaymentSuccess", "Fetching booking details for ID: " + bookingId);
+
+            // Gọi API
+            Call<BookingDetail> call = apiService.getBookingDetail(bookingId);
+            call.enqueue(new Callback<BookingDetail>() {
+                @Override
+                public void onResponse(Call<BookingDetail> call, Response<BookingDetail> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        BookingDetail booking = response.body();
+
+                        // ⭐ Hiển thị thông tin chi tiết
+                        tvFieldName.setText(booking.getFieldName());
+                        tvBookingDate.setText(booking.getBookingDate());
+
+                        // Format giờ: 08:00 - 09:00
+                        String timeSlot = booking.getTimeSlotStart() + " - " + booking.getTimeSlotEnd();
+                        tvTimeSlot.setText(timeSlot);
+
+                        // Format giá (nếu chưa có từ VNPay response)
+                        if (tvTotalAmount.getText().toString().equals("200,000đ") ||
+                                tvTotalAmount.getText().toString().isEmpty()) {
+                            NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
+                            tvTotalAmount.setText(formatter.format(booking.getTotalPrice()) + "đ");
+                        }
+
+                        Log.d("PaymentSuccess", "Booking details loaded: " + booking.getFieldName());
+
+                    } else {
+                        Log.e("PaymentSuccess", "Response not successful: " + response.code());
+                        // Hiển thị thông tin cơ bản từ VNPay
+                        tvFieldName.setText("Đặt sân thành công");
+                        tvBookingDate.setText("--");
+                        tvTimeSlot.setText("--");
+                        Toast.makeText(PaymentSuccessActivity.this,
+                                "Không thể tải chi tiết đơn đặt",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<BookingDetail> call, Throwable t) {
+                    Log.e("PaymentSuccess", "API call failed", t);
+                    // Hiển thị thông tin cơ bản
+                    tvFieldName.setText("Đặt sân thành công");
+                    tvBookingDate.setText("--");
+                    tvTimeSlot.setText("--");
+                    Toast.makeText(PaymentSuccessActivity.this,
+                            "Lỗi kết nối. Vui lòng xem chi tiết trong 'Đơn đặt của tôi'",
+                            Toast.LENGTH_SHORT).show();
+                }
+            });
+
+        } catch (NumberFormatException e) {
+            Log.e("PaymentSuccess", "Invalid booking ID format", e);
+            tvFieldName.setText("Đặt sân thành công");
+            tvBookingDate.setText("--");
+            tvTimeSlot.setText("--");
+        }
     }
 
     @Override
@@ -130,4 +199,3 @@ public class PaymentSuccessActivity extends AppCompatActivity {
         finish();
     }
 }
-
