@@ -10,7 +10,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import java.util.concurrent.TimeUnit;
 
 public class ApiClient {
-    private static final String BASE_URL = "http://10.0.2.2/sport-booking-api/api/";
+    private static final String BASE_URL = "http://dquangminh2003.id.vn/sport-booking-api/api/";
     private static final String TAG = "ApiClient";
     private static Retrofit retrofit = null;
 

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="oval">
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
     <gradient
-        android:angle="135"
+        android:angle="180"
         android:startColor="@color/md_theme_light_primary"
         android:endColor="@color/md_theme_light_secondary"
         android:type="linear" />
 </shape>
+

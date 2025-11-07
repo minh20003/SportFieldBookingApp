@@ -18,10 +18,10 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.SignInButton; // <<< Import nút Google
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 // Imports khác
+import com.google.android.material.button.MaterialButton; // <<< Import MaterialButton
 import com.google.android.material.textfield.TextInputEditText;
 import com.example.sportfieldbookingapp.R; // <<< THAY BẰNG PACKAGE CỦA BẠN
 import com.example.sportfieldbookingapp.api.ApiClient; // <<< THAY BẰNG PACKAGE CỦA BẠN
@@ -40,8 +40,7 @@ public class MainActivity extends AppCompatActivity {
 
     // Views
     private TextInputEditText etEmail, etPassword;
-    private Button btnLogin;
-    private SignInButton btnGoogleSignIn; // Nút Google
+    private MaterialButton btnLogin, btnGoogleSignIn; // Nút Login và Google
     private TextView tvGoToRegister, tvForgotPassword;
 
     // API Service
@@ -100,9 +99,6 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "btnGoogleSignIn clicked");
             signInWithGoogle(); // Gọi hàm đăng nhập Google
         });
-        // Cấu hình kích thước chữ cho nút Google (tùy chọn)
-        TextView textView = (TextView) btnGoogleSignIn.getChildAt(0);
-        textView.setText("Đăng nhập với Google");
 
         Log.d(TAG, "onCreate: Click listeners set");
     }
