@@ -20,7 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.sportfieldbookingapp.activities.TeammatePostDetailActivity;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.example.sportfieldbookingapp.R;
 import com.example.sportfieldbookingapp.activities.CreatePostActivity;
 import com.example.sportfieldbookingapp.activities.EditPostActivity;
@@ -45,7 +45,7 @@ public class FindTeammateFragment extends Fragment {
     private TeammatePostAdapter adapter;
     private List<TeammatePost> postList = new ArrayList<>();
     private ApiService apiService;
-    private FloatingActionButton fabCreatePost;
+    private ExtendedFloatingActionButton fabCreatePost;
     private int currentUserId = -1;
 
     @Nullable

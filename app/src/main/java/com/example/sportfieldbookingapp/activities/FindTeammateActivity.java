@@ -11,7 +11,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.app.AlertDialog;
 import android.content.SharedPreferences;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
+import androidx.appcompat.widget.Toolbar;
 import com.example.sportfieldbookingapp.R;
 import com.example.sportfieldbookingapp.adapters.TeammatePostAdapter;
 import com.example.sportfieldbookingapp.api.ApiClient;
@@ -33,13 +34,21 @@ public class FindTeammateActivity extends AppCompatActivity {
     private TeammatePostAdapter adapter;
     private List<TeammatePost> postList = new ArrayList<>();
     private ApiService apiService;
-    private FloatingActionButton fabCreatePost;
+    private ExtendedFloatingActionButton fabCreatePost;
     private int currentUserId = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_find_teammate);
+
+        // Setup Toolbar
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+        toolbar.setNavigationOnClickListener(v -> finish());
 
         SharedPreferences sharedPreferences = getSharedPreferences("AppPrefs", MODE_PRIVATE);
         currentUserId = sharedPreferences.getInt("USER_ID", -1);

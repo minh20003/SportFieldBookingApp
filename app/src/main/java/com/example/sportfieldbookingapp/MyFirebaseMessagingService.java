@@ -101,6 +101,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             int importance = NotificationManager.IMPORTANCE_HIGH;
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
             channel.setDescription(description);
+            channel.enableVibration(true);
+            channel.enableLights(true);
             notificationManager.createNotificationChannel(channel);
         }
 
@@ -110,34 +112,35 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         // Thêm dữ liệu vào Intent dựa trên loại thông báo
         if ("teammate_join".equals(notificationType)) {
-            intent.putExtra("NAVIGATE_TO", "find_teammate"); // Bảo HomeActivity mở tab Tìm người
+            intent.putExtra("NAVIGATE_TO", "find_teammate");
             if (postId != null) {
-                intent.putExtra("POST_ID", postId); // Gửi kèm ID (nếu cần mở chi tiết)
+                intent.putExtra("POST_ID", postId);
             }
+        } else if ("chat".equals(notificationType)) {
+            intent.putExtra("NAVIGATE_TO", "messages");
+            // Có thể thêm room_id để mở trực tiếp chat room
+        } else if ("booking_confirmed".equals(notificationType) || "booking_cancelled".equals(notificationType)) {
+            intent.putExtra("NAVIGATE_TO", "my_bookings");
         }
-        // TODO: Thêm các else if cho loại thông báo khác (ví dụ: booking_confirmed, booking_cancelled)
-        // else if ("booking_confirmed".equals(notificationType)) {
-        //     intent.putExtra("NAVIGATE_TO", "my_bookings");
-        //     intent.putExtra("BOOKING_ID", bookingId); // Cần gửi bookingId từ backend
-        // }
 
-        // Tạo PendingIntent - FLAG_UPDATE_CURRENT để cập nhật dữ liệu extra nếu intent giống nhau
-        // FLAG_IMMUTABLE là bắt buộc
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
-                PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+        // Tạo PendingIntent
+        int requestCode = (int) System.currentTimeMillis();
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, requestCode, intent,
+                PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
 
         // Xây dựng thông báo
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(this, CHANNEL_ID)
-                        .setSmallIcon(R.mipmap.ic_launcher_round) // Icon nhỏ
+                        .setSmallIcon(R.mipmap.ic_launcher_round)
                         .setContentTitle(messageTitle)
                         .setContentText(messageBody)
                         .setAutoCancel(true)
                         .setPriority(NotificationCompat.PRIORITY_HIGH)
-                        .setDefaults(NotificationCompat.DEFAULT_ALL) // Âm thanh, rung mặc định
-                        .setContentIntent(pendingIntent); // <<< GẮN PENDINGINTENT
+                        .setDefaults(NotificationCompat.DEFAULT_ALL)
+                        .setStyle(new NotificationCompat.BigTextStyle().bigText(messageBody))
+                        .setContentIntent(pendingIntent);
 
-        // Hiển thị thông báo với ID duy nhất (dựa trên thời gian)
-        notificationManager.notify((int) System.currentTimeMillis(), notificationBuilder.build());
+        // Hiển thị thông báo với ID duy nhất
+        notificationManager.notify(requestCode, notificationBuilder.build());
     }
 }

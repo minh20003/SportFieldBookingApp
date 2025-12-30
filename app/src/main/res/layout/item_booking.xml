@@ -1,69 +1,156 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="16dp"
     android:layout_marginVertical="8dp"
-    app:cardCornerRadius="8dp"
-    app:cardElevation="4dp">
+    app:cardCornerRadius="16dp"
+    app:cardElevation="4dp"
+    app:cardBackgroundColor="@color/white">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tvBookingFieldName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Tên sân thể thao"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:textColor="@color/black"/>
-
-        <TextView
-            android:id="@+id/tvBookingDateTime"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="Ngày: 2025-10-20 - Giờ: 17:00" />
-
-        <TextView
-            android:id="@+id/tvBookingStatus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Trạng thái: pending"
-            android:textStyle="italic"/>
+        <!-- Status Banner -->
         <LinearLayout
+            android:id="@+id/layoutStatusBanner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="8dp"
-            android:gravity="end">
+            android:gravity="center_vertical"
+            android:padding="12dp"
+            android:background="@drawable/bg_status_pending">
 
-            <Button
-                android:id="@+id/btnCancelBooking"
+            <ImageView
+                android:id="@+id/ivStatusIcon"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_clock"
+                app:tint="@color/white"
+                android:layout_marginEnd="8dp" />
+
+            <TextView
+                android:id="@+id/tvBookingStatus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Hủy Đơn"
-                style="?android:attr/buttonBarButtonStyle"
-                android:textColor="#F44336"
-                android:visibility="gone"
-                tools:visibility="visible"
-                android:layout_marginEnd="8dp"/>
+                android:text="Đang chờ xác nhận"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:textColor="@color/white" />
+        </LinearLayout>
 
-            <Button
-                android:id="@+id/btnReview"
+        <!-- Content -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Field Name -->
+            <TextView
+                android:id="@+id/tvBookingFieldName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Đánh giá"
-                style="?android:attr/buttonBarButtonStyle"
+                android:text="Sân Bóng Đá ABC"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Date Time Row -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="8dp">
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/ic_calendar"
+                    app:tint="@color/text_secondary"
+                    android:layout_marginEnd="8dp" />
+
+                <TextView
+                    android:id="@+id/tvBookingDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="20/10/2025"
+                    android:textSize="14sp"
+                    android:textColor="@color/text_secondary" />
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="14dp"
+                    android:background="@color/divider"
+                    android:layout_marginHorizontal="12dp" />
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/ic_clock"
+                    app:tint="@color/text_secondary"
+                    android:layout_marginEnd="8dp" />
+
+                <TextView
+                    android:id="@+id/tvBookingTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="17:00 - 18:00"
+                    android:textSize="14sp"
+                    android:textColor="@color/text_secondary" />
+            </LinearLayout>
+
+            <!-- Hidden field for combined datetime (for compatibility) -->
+            <TextView
+                android:id="@+id/tvBookingDateTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:visibility="gone"
-                tools:visibility="visible"/>
+                tools:text="Ngày: 2025-10-20 - Giờ: 17:00" />
+
+            <!-- Divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/divider"
+                android:layout_marginVertical="12dp" />
+
+            <!-- Action Buttons -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="end">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnCancelBooking"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:text="Hủy đơn"
+                    android:textSize="13sp"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:textColor="@color/error"
+                    android:visibility="gone"
+                    tools:visibility="visible"
+                    android:layout_marginEnd="8dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnReview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:text="Đánh giá"
+                    android:textSize="13sp"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:visibility="gone"
+                    tools:visibility="visible"
+                    app:cornerRadius="20dp" />
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
-</androidx.cardview.widget.CardView>
+</com.google.android.material.card.MaterialCardView>

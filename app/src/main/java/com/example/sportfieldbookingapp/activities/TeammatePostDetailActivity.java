@@ -114,9 +114,9 @@ public class TeammatePostDetailActivity extends AppCompatActivity {
 
     // Hiển thị dữ liệu lên giao diện
     private void populateUI(TeammatePost post) {
-        tvDetailSportType.setText("Môn: " + post.getSportType());
-        tvDetailPosterName.setText("Người đăng: " + post.getPosterName());
-        tvDetailPlayDateTime.setText("Thời gian: " + post.getTimeSlot() + " - " + post.getPlayDate());
+        tvDetailSportType.setText(post.getSportType());
+        tvDetailPosterName.setText(post.getPosterName());
+        tvDetailPlayDateTime.setText(post.getTimeSlot() + " - " + post.getPlayDate());
         tvDetailPlayersNeeded.setText("Cần tìm: " + post.getPlayersNeeded() + " người");
         tvDetailDescription.setText(post.getDescription());
 
@@ -211,6 +211,7 @@ public class TeammatePostDetailActivity extends AppCompatActivity {
                     int roomId = response.body().getRoomId();
                     Intent intent = new Intent(TeammatePostDetailActivity.this, ChatActivity.class);
                     intent.putExtra("room_id", roomId);
+                    intent.putExtra("other_user_id", otherUserId);
                     intent.putExtra("other_user_name", otherUserName);
                     startActivity(intent);
                 } else {

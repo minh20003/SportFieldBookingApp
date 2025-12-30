@@ -67,9 +67,12 @@
     <!-- Legacy Colors (backward compatible) - Updated with modern scheme -->
     <color name="primary">#1E88E5</color>
     <color name="primary_dark">#1565C0</color>
+    <color name="primary_light">#90CAF9</color>
     <color name="accent">#26A69A</color>
 
     <color name="background">#F7F9FC</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="surface_variant">#F3F4F6</color>
     <color name="unread_notification_bg">#E3F2FD</color>
 
     <color name="text_primary">#1A1C1E</color>

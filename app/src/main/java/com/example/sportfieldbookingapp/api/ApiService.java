@@ -7,6 +7,8 @@ import com.example.sportfieldbookingapp.models.ChatMessageListResponse;
 import com.example.sportfieldbookingapp.models.ChatRoomListResponse;
 import com.example.sportfieldbookingapp.models.CreateChatRoomRequest;
 import com.example.sportfieldbookingapp.models.CreateChatRoomResponse;
+import com.example.sportfieldbookingapp.models.DeleteMessageRequest;
+import com.example.sportfieldbookingapp.models.DeleteChatRoomRequest;
 import com.example.sportfieldbookingapp.models.DeletePostRequest;
 import com.example.sportfieldbookingapp.models.JoinPostRequest;
 import com.example.sportfieldbookingapp.models.LoginResponse;
@@ -207,6 +209,26 @@ public interface ApiService {
     Call<GenericResponse> sendChatMessage(
             @Header("Authorization") String token,
             @Body SendMessageRequest request
+    );
+
+    /**
+     * Xóa tin nhắn (phía mình hoặc thu hồi tất cả)
+     * POST /api/chat/delete_message.php
+     */
+    @POST("chat/delete_message.php")
+    Call<GenericResponse> deleteMessage(
+            @Header("Authorization") String token,
+            @Body DeleteMessageRequest request
+    );
+
+    /**
+     * Xóa đoạn chat
+     * POST /api/chat/delete_chat_room.php
+     */
+    @POST("chat/delete_chat_room.php")
+    Call<GenericResponse> deleteChatRoom(
+            @Header("Authorization") String token,
+            @Body DeleteChatRoomRequest request
     );
 
 }

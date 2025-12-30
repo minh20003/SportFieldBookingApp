@@ -49,11 +49,11 @@ public class TeammatePostAdapter extends RecyclerView.Adapter<TeammatePostAdapte
     public void onBindViewHolder(@NonNull PostViewHolder holder, int position) {
         TeammatePost post = postList.get(position);
 
-        holder.tvSportType.setText("Môn: " + post.getSportType());
-        holder.tvPosterName.setText("Người đăng: " + post.getPosterName());
-        holder.tvPlayDateTime.setText("Thời gian: " + post.getTimeSlot() + " - " + post.getPlayDate());
-        holder.tvPlayersNeeded.setText("Cần tìm: " + post.getPlayersNeeded() + " người");
-        holder.tvDescription.setText("Mô tả: " + post.getDescription());
+        holder.tvSportType.setText(post.getSportType());
+        holder.tvPosterName.setText(post.getPosterName());
+        holder.tvPlayDateTime.setText(post.getTimeSlot() + " - " + post.getPlayDate());
+        holder.tvPlayersNeeded.setText("Cần " + post.getPlayersNeeded() + " người");
+        holder.tvDescription.setText(post.getDescription());
 
         // Kiểm tra quyền sở hữu để hiển thị/ẩn nút
         if (post.getUserId() == currentUserId) {

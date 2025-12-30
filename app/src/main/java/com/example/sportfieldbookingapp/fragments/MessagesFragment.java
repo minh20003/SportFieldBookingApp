@@ -1,13 +1,14 @@
 package com.example.sportfieldbookingapp.fragments;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -15,35 +16,35 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.sportfieldbookingapp.R;
 import com.example.sportfieldbookingapp.activities.ChatActivity;
 import com.example.sportfieldbookingapp.adapters.ChatRoomAdapter;
-import com.example.sportfieldbookingapp.api.ApiClient;
-import com.example.sportfieldbookingapp.api.ApiService;
 import com.example.sportfieldbookingapp.models.ChatRoom;
-import com.example.sportfieldbookingapp.models.ChatRoomListResponse;
+import com.example.sportfieldbookingapp.viewmodel.MessagesViewModel;
 
 import java.util.ArrayList;
-import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class MessagesFragment extends Fragment {
 
     private static final String TAG = "MessagesFragment";
-    
+
+    // Views
     private RecyclerView recyclerView;
     private ProgressBar progressBar;
+    private LinearLayout layoutEmpty;
     private TextView tvEmpty;
+    private EditText etSearch;
     private androidx.swiperefreshlayout.widget.SwipeRefreshLayout swipeRefreshLayout;
+
+    // Adapter
     private ChatRoomAdapter adapter;
-    private final List<ChatRoom> chatRooms = new ArrayList<>();
-    private ApiService apiService;
+
+    // ViewModel
+    private MessagesViewModel viewModel;
 
     @Nullable
     @Override
@@ -55,120 +56,135 @@ public class MessagesFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        initViews(view);
+        setupViewModel();
+        setupRecyclerView();
+        setupListeners();
+
+        // Initial load
+        viewModel.loadChatRooms(true);
+    }
+
+    private void initViews(View view) {
         recyclerView = view.findViewById(R.id.recyclerViewChatRooms);
         progressBar = view.findViewById(R.id.progressBar);
+        layoutEmpty = view.findViewById(R.id.layoutEmpty);
         tvEmpty = view.findViewById(R.id.tvEmpty);
+        etSearch = view.findViewById(R.id.etSearch);
         swipeRefreshLayout = view.findViewById(R.id.swipeRefresh);
+    }
+
+    private void setupViewModel() {
+        viewModel = new ViewModelProvider(this).get(MessagesViewModel.class);
+
+        // Observe filtered chat rooms
+        viewModel.getFilteredChatRooms().observe(getViewLifecycleOwner(), rooms -> {
+            if (rooms != null) {
+                adapter.updateRooms(rooms);
+            }
+        });
+
+        // Observe loading state
+        viewModel.getIsLoading().observe(getViewLifecycleOwner(), isLoading -> {
+            progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+        });
+
+        // Observe refreshing state
+        viewModel.getIsRefreshing().observe(getViewLifecycleOwner(), isRefreshing -> {
+            swipeRefreshLayout.setRefreshing(isRefreshing);
+        });
+
+        // Observe empty state
+        viewModel.getIsEmpty().observe(getViewLifecycleOwner(), isEmpty -> {
+            layoutEmpty.setVisibility(isEmpty ? View.VISIBLE : View.GONE);
+        });
+
+        // Observe errors
+        viewModel.getError().observe(getViewLifecycleOwner(), error -> {
+            if (error != null && !error.isEmpty()) {
+                Toast.makeText(getContext(), error, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // Observe total unread count (could be used for badge)
+        viewModel.getTotalUnreadCount().observe(getViewLifecycleOwner(), count -> {
+            // Update badge if needed
+        });
+    }
+
+    private void setupRecyclerView() {
+        adapter = new ChatRoomAdapter(getContext(), new ArrayList<>(), new ChatRoomAdapter.OnChatRoomClickListener() {
+            @Override
+            public void onChatRoomClick(ChatRoom chatRoom) {
+                // Mark as read when opening
+                viewModel.markRoomAsRead(chatRoom.getRoomId());
+
+                // Open chat
+                Intent intent = new Intent(getContext(), ChatActivity.class);
+                intent.putExtra("room_id", chatRoom.getRoomId());
+                intent.putExtra("other_user_id", chatRoom.getOtherUserId());
+                intent.putExtra("other_user_name", chatRoom.getOtherUserName());
+                startActivity(intent);
+            }
+
+            @Override
+            public void onChatRoomLongClick(ChatRoom chatRoom) {
+                showChatRoomOptionsDialog(chatRoom);
+            }
+        });
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new ChatRoomAdapter(getContext(), chatRooms, chatRoom -> {
-            Intent intent = new Intent(getContext(), ChatActivity.class);
-            intent.putExtra("room_id", chatRoom.getRoomId());
-            intent.putExtra("other_user_name", chatRoom.getOtherUserName());
-            startActivity(intent);
-        });
         recyclerView.setAdapter(adapter);
+    }
 
-        swipeRefreshLayout.setOnRefreshListener(() -> loadChatRooms(false));
+    private void showChatRoomOptionsDialog(ChatRoom chatRoom) {
+        String[] options = {"Xóa đoạn chat"};
+        
+        new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                .setTitle(chatRoom.getOtherUserName())
+                .setItems(options, (dialog, which) -> {
+                    if (which == 0) {
+                        showDeleteChatRoomConfirmation(chatRoom);
+                    }
+                })
+                .show();
+    }
 
-        apiService = ApiClient.getClient().create(ApiService.class);
+    private void showDeleteChatRoomConfirmation(ChatRoom chatRoom) {
+        new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                .setTitle("Xóa đoạn chat")
+                .setMessage("Đoạn chat sẽ bị xóa ở phía bạn. Nếu có tin nhắn mới, đoạn chat sẽ xuất hiện lại.")
+                .setPositiveButton("Xóa", (dialog, which) -> {
+                    viewModel.deleteChatRoom(chatRoom.getRoomId());
+                })
+                .setNegativeButton("Hủy", null)
+                .show();
+    }
 
-        loadChatRooms(true);
+    private void setupListeners() {
+        // Pull to refresh
+        swipeRefreshLayout.setColorSchemeResources(R.color.primary);
+        swipeRefreshLayout.setOnRefreshListener(() -> viewModel.refresh());
+
+        // Search
+        etSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                viewModel.filterRooms(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        // Chỉ reload nếu đã có data (không phải lần đầu)
-        if (!chatRooms.isEmpty()) {
-            loadChatRooms(false);
-        }
-    }
-
-    private void loadChatRooms(boolean showLoading) {
-        if (!isAdded()) {
-            return;
-        }
-
-        SharedPreferences prefs = requireContext().getSharedPreferences("AppPrefs", Context.MODE_PRIVATE);
-        String authToken = prefs.getString("USER_TOKEN", null);
-
-        if (authToken == null || authToken.isEmpty()) {
-            progressBar.setVisibility(View.GONE);
-            swipeRefreshLayout.setRefreshing(false);
-            tvEmpty.setVisibility(View.VISIBLE);
-            tvEmpty.setText("Vui lòng đăng nhập để xem tin nhắn");
-            chatRooms.clear();
-            adapter.notifyDataSetChanged();
-            return;
-        }
-
-        if (showLoading) {
-            progressBar.setVisibility(View.VISIBLE);
-            tvEmpty.setVisibility(View.GONE);
-        }
-
-        String token = "Bearer " + authToken;
-
-        Log.d(TAG, "Loading chat rooms with token: Bearer ***");
-        
-        apiService.getChatRooms(token).enqueue(new Callback<ChatRoomListResponse>() {
-            @Override
-            public void onResponse(@NonNull Call<ChatRoomListResponse> call, @NonNull Response<ChatRoomListResponse> response) {
-                if (!isAdded()) {
-                    return;
-                }
-
-                Log.d(TAG, "Response code: " + response.code());
-                progressBar.setVisibility(View.GONE);
-                swipeRefreshLayout.setRefreshing(false);
-
-                if (response.isSuccessful() && response.body() != null) {
-                    Log.d(TAG, "Response successful: " + response.body().isSuccess());
-                    if (response.body().isSuccess()) {
-                        List<ChatRoom> rooms = response.body().getData();
-                        chatRooms.clear();
-                        if (rooms != null) {
-                            chatRooms.addAll(rooms);
-                            Log.d(TAG, "Loaded " + rooms.size() + " chat rooms");
-                        }
-                        adapter.notifyDataSetChanged();
-
-                        tvEmpty.setVisibility(chatRooms.isEmpty() ? View.VISIBLE : View.GONE);
-                        if (chatRooms.isEmpty()) {
-                            tvEmpty.setText("Chưa có cuộc trò chuyện nào");
-                        }
-                    } else {
-                        Log.w(TAG, "Response success=false");
-                        tvEmpty.setVisibility(chatRooms.isEmpty() ? View.VISIBLE : View.GONE);
-                        if (chatRooms.isEmpty()) {
-                            tvEmpty.setText("Không thể tải danh sách cuộc trò chuyện");
-                        }
-                    }
-                } else {
-                    Log.e(TAG, "Response not successful: " + response.code() + " - " + response.message());
-                    tvEmpty.setVisibility(chatRooms.isEmpty() ? View.VISIBLE : View.GONE);
-                    if (chatRooms.isEmpty()) {
-                        tvEmpty.setText("Không thể tải danh sách cuộc trò chuyện\nMã lỗi: " + response.code());
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<ChatRoomListResponse> call, @NonNull Throwable t) {
-                if (!isAdded()) {
-                    return;
-                }
-                Log.e(TAG, "Request failed: " + t.getClass().getName() + " - " + t.getMessage(), t);
-                progressBar.setVisibility(View.GONE);
-                swipeRefreshLayout.setRefreshing(false);
-                
-                if (chatRooms.isEmpty()) {
-                    tvEmpty.setVisibility(View.VISIBLE);
-                    tvEmpty.setText("Lỗi kết nối: " + t.getMessage() + "\n\nKiểm tra:\n- XAMPP đang chạy\n- Apache đã start\n- API endpoint tồn tại");
-                }
-            }
-        });
+        // Refresh when returning to this fragment
+        viewModel.refresh();
     }
 }
-

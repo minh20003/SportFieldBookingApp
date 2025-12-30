@@ -4,6 +4,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.core.content.ContextCompat;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
@@ -27,6 +33,8 @@ import com.example.sportfieldbookingapp.fragments.HomeFragment;
 import com.example.sportfieldbookingapp.fragments.MyBookingsFragment;
 import com.example.sportfieldbookingapp.fragments.MessagesFragment;
 import com.example.sportfieldbookingapp.fragments.ProfileFragment;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.example.sportfieldbookingapp.models.GenericResponse;
 import com.example.sportfieldbookingapp.models.NotificationResponse;
 
 import retrofit2.Call;
@@ -37,6 +45,17 @@ public class HomeActivity extends AppCompatActivity {
 
     private static final String TAG = "HomeActivity";
     private BottomNavigationView bottomNavigationView;
+
+    // Permission launcher for notifications (Android 13+)
+    private final ActivityResultLauncher<String> requestPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                if (isGranted) {
+                    Log.d(TAG, "Notification permission granted");
+                    registerFcmToken();
+                } else {
+                    Log.w(TAG, "Notification permission denied");
+                }
+            });
 
     // ============================================
     // THÊM CÁC BIẾN MỚI CHO NOTIFICATION BADGE
@@ -98,6 +117,80 @@ public class HomeActivity extends AppCompatActivity {
                 loadFragment(selectedFragment);
             }
             return true;
+        });
+
+        // Đăng ký FCM token khi app khởi động
+        askNotificationPermission();
+    }
+
+    /**
+     * Yêu cầu quyền notification (Android 13+)
+     */
+    private void askNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
+                    PackageManager.PERMISSION_GRANTED) {
+                // Permission already granted
+                registerFcmToken();
+            } else {
+                // Request permission
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+            }
+        } else {
+            // Android < 13, no permission needed
+            registerFcmToken();
+        }
+    }
+
+    /**
+     * Đăng ký FCM token với server
+     */
+    private void registerFcmToken() {
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(task -> {
+                    if (!task.isSuccessful()) {
+                        Log.w(TAG, "Fetching FCM registration token failed", task.getException());
+                        return;
+                    }
+
+                    // Get new FCM registration token
+                    String token = task.getResult();
+                    Log.d(TAG, "FCM Token: " + token);
+
+                    // Gửi token lên server
+                    sendFcmTokenToServer(token);
+                });
+    }
+
+    /**
+     * Gửi FCM token lên server
+     */
+    private void sendFcmTokenToServer(String fcmToken) {
+        SharedPreferences sharedPreferences = getSharedPreferences("AppPrefs", Context.MODE_PRIVATE);
+        String authToken = sharedPreferences.getString("USER_TOKEN", null);
+
+        if (authToken == null) {
+            Log.w(TAG, "sendFcmTokenToServer: No auth token, saving FCM token for later");
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString("PENDING_FCM_TOKEN", fcmToken);
+            editor.apply();
+            return;
+        }
+
+        apiService.updateFcmToken("Bearer " + authToken, fcmToken).enqueue(new Callback<GenericResponse>() {
+            @Override
+            public void onResponse(Call<GenericResponse> call, Response<GenericResponse> response) {
+                if (response.isSuccessful()) {
+                    Log.i(TAG, "FCM Token sent to server successfully");
+                } else {
+                    Log.w(TAG, "Failed to send FCM Token to server. Code: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<GenericResponse> call, Throwable t) {
+                Log.e(TAG, "Error sending FCM Token to server: " + t.getMessage());
+            }
         });
     }
 

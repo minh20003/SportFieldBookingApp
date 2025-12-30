@@ -5,8 +5,13 @@ import android.text.TextUtils;
 
 public final class ImageUrlHelper {
 
-    private static final String BASE_HOST = "http://10.0.2.2";
-    private static final String BASE_APP = "http://10.0.2.2/sport-booking-api/";
+    // Đổi giữa localhost (test) và production (deploy)
+    private static final boolean USE_LOCAL = false; // false = dùng server online
+    
+    private static final String BASE_HOST = USE_LOCAL ? 
+            "http://10.0.2.2" : "http://dquangminh2003.id.vn";
+    private static final String BASE_APP = USE_LOCAL ?
+            "http://10.0.2.2/sport-booking-api/" : "http://dquangminh2003.id.vn/sport-booking-api/";
     
     // Fallback placeholder images - ảnh sân thể thao miễn phí
     private static final String[] FALLBACK_IMAGES = {

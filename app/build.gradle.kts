@@ -5,14 +5,12 @@ plugins {
 
 android {
     namespace = "com.example.sportfieldbookingapp"
-    compileSdk {
-        version = release(36)
-    }
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.sportfieldbookingapp"
-        minSdk = 24
-        targetSdk = 36
+        minSdk = 26
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -61,4 +59,13 @@ dependencies {
     implementation("androidx.annotation:annotation:1.7.1")
     implementation("com.google.android.gms:play-services-auth:21.0.0")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01")
+
+    // Emoji Picker
+    implementation("androidx.emoji2:emoji2:1.4.0")
+    implementation("androidx.emoji2:emoji2-views:1.4.0")
+    implementation("androidx.emoji2:emoji2-views-helper:1.4.0")
+    implementation("androidx.emoji2:emoji2-emojipicker:1.4.0")
+
+    // Zegocloud - Video/Voice Call (uncomment khi JitPack hoạt động)
+     implementation("com.github.ZEGOCLOUD:zego_uikit_prebuilt_call_android:+")
 }

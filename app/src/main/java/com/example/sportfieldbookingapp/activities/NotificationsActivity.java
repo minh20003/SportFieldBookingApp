@@ -194,14 +194,33 @@ public class NotificationsActivity extends AppCompatActivity {
                 if ("teammate_join".equals(notification.getType())) {
                     int postId = data.optInt("post_id", 0);
                     if (postId > 0) {
-                        Intent intent = new Intent(this, TeammatePostDetailActivity.class);
-                        intent.putExtra("post_id", postId);
+                        // Chuyển về HomeActivity và mở tab Find Teammate
+                        Intent intent = new Intent(this, HomeActivity.class);
+                        intent.putExtra("NAVIGATE_TO", "find_teammate");
+                        intent.putExtra("POST_ID", String.valueOf(postId));
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                         startActivity(intent);
+                        finish(); // Đóng NotificationsActivity
                     }
+                } else if ("booking".equals(notification.getType())) {
+                    // Điều hướng đến My Bookings
+                    Intent intent = new Intent(this, HomeActivity.class);
+                    intent.putExtra("NAVIGATE_TO", "my_bookings");
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                    startActivity(intent);
+                    finish();
+                } else if ("chat".equals(notification.getType())) {
+                    // Điều hướng đến Messages
+                    Intent intent = new Intent(this, HomeActivity.class);
+                    intent.putExtra("NAVIGATE_TO", "messages");
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                    startActivity(intent);
+                    finish();
                 }
             }
         } catch (Exception e) {
-            Log.e(TAG, "Error: " + e.getMessage());
+            Log.e(TAG, "handleNotificationClick error: " + e.getMessage());
+            Toast.makeText(this, "Có lỗi xảy ra", Toast.LENGTH_SHORT).show();
         }
     }
 
